@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="MikuGreen">#39c5bb</Color>
+    <Color x:Key="MikuRed">#e74892</Color>
+    <Color x:Key="MeaBlue">#7dcce1</Color>
+    <Color x:Key="MeaYellow">#fbd474</Color>
+    <Color x:Key="RemBlue">#99bbff</Color>
+    <Color x:Key="MikuGreenAA">#AA39c5bb</Color>
+    <Color x:Key="MikuRedAA">#AAe74892</Color>
+    <Color x:Key="MeaBlueAA">#AA7dcce1</Color>
+    <Color x:Key="MeaYellowAA">#AAfbd474</Color>
+    <Color x:Key="RemBlueAA">#AA99bbff</Color>
+    <Color x:Key="MikuGreen55">#5539c5bb</Color>
+    <Color x:Key="MikuRed55">#55e74892</Color>
+    <Color x:Key="MeaBlue55">#557dcce1</Color>
+    <Color x:Key="MeaYellow55">#55fbd474</Color>
+    <Color x:Key="RemBlue55">#5599bbff</Color>
+</ResourceDictionary>
