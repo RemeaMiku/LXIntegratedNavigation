@@ -14,4 +14,23 @@
     <Color x:Key="MeaBlue55">#557dcce1</Color>
     <Color x:Key="MeaYellow55">#55fbd474</Color>
     <Color x:Key="RemBlue55">#5599bbff</Color>
+    <Color x:Key="ForeGroundGray">#CDCDCD</Color>
+    <Color x:Key="BackGroundGray">#EFEFEF</Color>
+    <SolidColorBrush x:Key="MikuGreenBrush" Color="{StaticResource MikuGreen}" />
+    <SolidColorBrush x:Key="MikuRedBrush" Color="{StaticResource MikuRed}" />
+    <SolidColorBrush x:Key="MeaBlueBrush" Color="{StaticResource MeaBlue}" />
+    <SolidColorBrush x:Key="MeaYellowBrush" Color="{StaticResource MeaYellow}" />
+    <SolidColorBrush x:Key="RemBlueBrush" Color="{StaticResource RemBlue}" />
+    <SolidColorBrush x:Key="MikuGreenBrushAA" Color="{StaticResource MikuGreenAA}" />
+    <SolidColorBrush x:Key="MikuRedBrushAA" Color="{StaticResource MikuRedAA}" />
+    <SolidColorBrush x:Key="MeaBlueBrushAA" Color="{StaticResource MeaBlueAA}" />
+    <SolidColorBrush x:Key="MeaYellowBrushAA" Color="{StaticResource MeaYellowAA}" />
+    <SolidColorBrush x:Key="RemBlueBrushAA" Color="{StaticResource RemBlueAA}" />
+    <SolidColorBrush x:Key="MikuGreenBrush55" Color="{StaticResource MikuGreen55}" />
+    <SolidColorBrush x:Key="MikuRedBrush55" Color="{StaticResource MikuRed55}" />
+    <SolidColorBrush x:Key="MeaBlueBrush55" Color="{StaticResource MeaBlue55}" />
+    <SolidColorBrush x:Key="MeaYellowBrush55" Color="{StaticResource MeaYellow55}" />
+    <SolidColorBrush x:Key="RemBlueBrush55" Color="{StaticResource RemBlue55}" />
+    <SolidColorBrush x:Key="ForeGroundGrayBrush" Color="{StaticResource ForeGroundGray}" />
+    <SolidColorBrush x:Key="BackGroundGrayBrush" Color="{StaticResource BackGroundGray}" />
 </ResourceDictionary>

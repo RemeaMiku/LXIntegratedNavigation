@@ -2,6 +2,11 @@
 global using static System.Console;
 global using NaviSharp;
 global using static NaviSharp.Angle;
+global using static NaviSharp.EarthEllipsoid;
 global using static NaviSharp.Constants;
 global using Vector = NaviSharp.Vector<double>;
 global using Matrix = NaviSharp.Matrix<double>;
+global using LXIntegratedNavigation.Shared;
+global using LXIntegratedNavigation.Shared.Models;
+global using LXIntegratedNavigation.Shared.Services;
+global using static LXIntegratedNavigation.Shared.Services.AscFileService;

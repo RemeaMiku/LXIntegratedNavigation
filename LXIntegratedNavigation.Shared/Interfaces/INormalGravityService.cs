@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LXIntegratedNavigation.Shared.Interfaces;
 
-public interface IGravityService
+public interface INormalGravityService
 {
     public double CalculateNormalGravity(Angle latitude, double height);
 }

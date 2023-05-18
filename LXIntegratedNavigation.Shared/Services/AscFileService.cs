@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace LXIntegratedNavigation.Shared.Services;
 
 public class AscFileService
 {
+
     private static IEnumerable<T> FileStreamReadLine<T>(string filePath, Func<string, T?> func)
     {
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -26,6 +28,17 @@ public class AscFileService
             yield return result;
         }
     }
+
+    private static void FileStreamWriteLine<T>(string filePath, IEnumerable<T> values, Func<T, string> func)
+    {
+        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+        using var writer = new StreamWriter(stream);
+        foreach (var value in values)
+            writer.WriteLine(value);
+    }
+
+    public static string GetPathAtDesktop(string fileName)
+    => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
 
     public static IEnumerable<ImuData> ReadImuDatas(string filePath)
     {
@@ -54,5 +67,43 @@ public class AscFileService
             return null;
         });
         return FileStreamReadLine(filePath, func);
+    }
+
+    public static void WritePoses(string filePath, IEnumerable<NavigationPose> poses)
+    {
+        using var stream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write);
+        using var writer = new StreamWriter(stream);
+        writer.WriteLine("Week,Sow(s),Lat(deg),Lon(deg),Hgt(m),NorthVel(m/s),EastVel(m/s),DownVel(m/s),Yaw(deg),Pitch(deg),Roll(deg)");
+        foreach (var pose in poses)
+        {
+            writer.WriteLine($"{pose.TimeStamp.Week},{pose.TimeStamp.Sow:F2},{pose.Latitude.Degrees:F8},{pose.Longitude.Degrees:F8},{pose.Altitude:F4},{pose.NorthVelocity:F4},{pose.EastVellocity:F4},{pose.GroundVelocity:F4},{pose.Yaw.Degrees:F8},{pose.Pitch.Degrees:F8},{pose.Roll.Degrees:F8}");
+        }
+    }
+
+    public static IEnumerable<NavigationPose> ReadPosFile(string filePath)
+    {
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using var reader = new StreamReader(stream);
+        reader.ReadLine();
+        reader.ReadLine();
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (line is null || string.IsNullOrWhiteSpace(line))
+                continue;
+            var values = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var week = ushort.Parse(values[0]);
+            var sow = double.Parse(values[1]);
+            var lat = double.Parse(values[2]);
+            var lon = double.Parse(values[3]);
+            var hgt = double.Parse(values[4]);
+            var ve = double.Parse(values[5]);
+            var vn = double.Parse(values[6]);
+            var vu = double.Parse(values[7]);
+            var yaw = Map(FromDegrees(double.Parse(values[11])), AngleRange.NegativeStraightToStraight);
+            var pitch = FromDegrees(double.Parse(values[12]));
+            var roll = FromDegrees(double.Parse(values[13]));
+            yield return new NavigationPose(new(week, sow), new(lat, lon, hgt), new(new[] { vn, ve, -vu }), new(yaw, pitch, roll));
+        }
     }
 }

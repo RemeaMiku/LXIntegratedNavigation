@@ -8,7 +8,7 @@ using LXIntegratedNavigation.Shared.Interfaces;
 
 namespace LXIntegratedNavigation.Shared.Services;
 
-internal class Grs80GravityService : IGravityService
+public class Grs80NormalGravityModel : INormalGravityService
 {
     public double CalculateNormalGravity(Angle latitude, double height)
     {

@@ -1,10 +1,14 @@
-﻿using LXIntegratedNavigation.Shared.Models;
-using LXIntegratedNavigation.Shared.Services;
-
-var imuDatas = new List<ImuData>(AscFileService.ReadImuDatas("D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\cover_Rover\\20230511_cover_imu.ASC"));
-imuDatas = imuDatas.DistinctBy(data => data.TimeStamp).ToList();
-var initLatitude = FromDegrees(30.5278045116);
-var initHeight = 22.119;
-
-var inertialNavigationService = new InertialNavigationService(new Grs80GravityService());
-WriteLine(inertialNavigationService.StaticAlignment(initLatitude, initHeight, imuDatas).ToString("F4", null));
+﻿var imuDatasPathInWideEnvironment = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\cover_Rover\\20230511_cover_imu.ASC";
+var imuDatas = ReadImuDatas(imuDatasPathInWideEnvironment);
+imuDatas = imuDatas.DistinctBy(data => data.TimeStamp);
+var initCoord = new GeodeticCoord(FromDegrees(30.52844163), FromDegrees(114.35697688), 22.334);
+var grs80GravityModel = new Grs80NormalGravityModel();
+var ins = new InertialNavigation(grs80GravityModel, Grs80);
+//const int samplingRate = 100;
+//var staticEpochNum = 5 * 60 * samplingRate;
+var staticImuDatas = imuDatas.Where(data => data.TimeStamp < new GpsTime(2261, 360077.750));
+var initEularAngle = ins.StaticAlignment(initCoord, staticImuDatas);
+var dynamicImuDatas = imuDatas.Skip(staticImuDatas.Count());
+var initPose = new NavigationPose(dynamicImuDatas.First().TimeStamp, initCoord, new(3), initEularAngle);
+var insResult = ins.Solve(initPose, dynamicImuDatas, 0.01);
+WritePoses(GetPathAtDesktop($"{Path.GetFileNameWithoutExtension(imuDatasPathInWideEnvironment)}InsResult_{DateTime.Now:yyMMddHHmmss}.csv"), insResult);

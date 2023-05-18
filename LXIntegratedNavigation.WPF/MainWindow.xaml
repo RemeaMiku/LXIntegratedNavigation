@@ -5,9 +5,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="MainWindow"
+    xmlns:v="clr-namespace:LXIntegratedNavigation.WPF.Views"
+    xmlns:vw="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
+    Title="{Binding Title}"
     Width="800"
     Height="450"
+    MinWidth="{Binding WindowMinWidth}"
+    MinHeight="{Binding WindowMaxHeight}"
+    d:DataContext="{d:DesignInstance Type=vw:MainWindowViewModel}"
+    AllowsTransparency="True"
+    Template="{DynamicResource MainWindowTemplate}"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
     mc:Ignorable="d">
     <Window.Resources>
         <Style x:Key="MenuRadioButtonStyle" TargetType="{x:Type RadioButton}">
@@ -147,5 +156,21 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid />
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CaptionHeight="{Binding CaptionHeight}"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="{Binding ResizeBorderThickness}" />
+    </WindowChrome.WindowChrome>
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Frame
+            x:Name="PageFrame"
+            Grid.Column="1"
+            Content="{Binding CurrentPage}" />
+    </Grid>
 </Window>
