@@ -8,6 +8,5 @@ internal partial class MainWindowViewModel : WindowViewModel
 {
     public MainWindowViewModel(Window window) : base(window) { }
 
-    [ObservableProperty]
-    public Page _currentPage = HomePage.Instance;
+
 }

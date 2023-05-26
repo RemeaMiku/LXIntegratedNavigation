@@ -8,5 +8,5 @@ namespace LXIntegratedNavigation.Shared.Interfaces;
 
 public interface INormalGravityService
 {
-    public double CalculateNormalGravity(Angle latitude, double height);
+    public double NormalGravityAt(Angle latitude, double altitude);
 }

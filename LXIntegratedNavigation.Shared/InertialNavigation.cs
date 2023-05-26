@@ -20,23 +20,22 @@ public class InertialNavigation
         _ellipsoid = ellipsoid;
     }
 
-    private Vector BuildGn(GeodeticCoord coord) => new(new double[] { 0, 0, _gravityService.CalculateNormalGravity(coord.Latitude, coord.Altitude) });
+    private Vector BuildGn(Angle latitude, double altitude) => new(new double[] { 0, 0, _gravityService.NormalGravityAt(latitude, altitude) });
 
-    private static Vector BuildOmega_ie_n(double latRads)
-    => new(new double[] { EarthRotationSpeed * Cos(latRads), 0, -EarthRotationSpeed * Sin(latRads) });
+    private static Vector BuildOmega_ie_n(Angle latitude)
+    => new(new double[] { EarthRotationSpeed * Cos(latitude), 0, -EarthRotationSpeed * Sin(latitude) });
 
-    private Vector BuildOmega_en_n(double latRads, double height, double velNorth, double velEast)
+    private Vector BuildOmega_en_n(Angle latitude, double altitude, double velNorth, double velEast)
     {
-        var rm = _ellipsoid.M(latRads);
-        var rn = _ellipsoid.N(latRads);
-        return new(new double[] { velEast / (rn + height), -velNorth / (rm + height), -velEast * Tan(latRads) / (rn + height) });
+        var rm = _ellipsoid.M(latitude);
+        var rn = _ellipsoid.N(latitude);
+        return new(new double[] { velEast / (rn + altitude), -velNorth / (rm + altitude), -velEast * Tan(latitude) / (rn + altitude) });
     }
 
-    public EulerAngle StaticAlignment(Angle initLatitude, double initHeight, IEnumerable<ImuData> imuDatas)
+    public EulerAngle StaticAlignment(Angle initLatitude, double initAltitude, IEnumerable<ImuData> imuDatas)
     {
-        var gravity = _gravityService.CalculateNormalGravity(initLatitude, initHeight);
-        var gn = new Vector(new double[] { 0, 0, gravity });
-        var omega_ie_n = BuildOmega_ie_n(initLatitude.Radians);
+        var gn = BuildGn(initLatitude, initAltitude);
+        var omega_ie_n = BuildOmega_ie_n(initLatitude);
         var v_g = gn.Unitization();
         var v_omega = gn.OuterProduct(omega_ie_n).Unitization();
         var v_gOmega = gn.OuterProduct(omega_ie_n).OuterProduct(gn).Unitization();
@@ -70,13 +69,12 @@ public class InertialNavigation
         var dv_pre = preImu.Accelerometer * dt;
         var dtheta_pre = preImu.Gyroscope * dt;
         var deltav_fk_b = dv_cur + 0.5 * dtheta_cur.OuterProduct(dv_cur) + (dtheta_pre.OuterProduct(dv_cur) + dv_pre.OuterProduct(dtheta_cur)) / 12;
-        var omega_ie_n = BuildOmega_ie_n(prePose.B);
-        var omega_en_n = BuildOmega_en_n(prePose.B, prePose.Altitude, prePose.NorthVelocity, prePose.EastVellocity);
+        var omega_ie_n = BuildOmega_ie_n(prePose.Latitude);
+        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.Altitude, prePose.NorthVelocity, prePose.EastVellocity);
         var zeta = (omega_ie_n + omega_en_n) * dt;
         var preRotationMatrix = prePose.EulerAngle.ToRotationMatrix<double>();
         var deltav_fk_n = (Matrix.Identity(3) - 0.5 * Matrix.FromAxialVector(zeta)) * preRotationMatrix * deltav_fk_b;
-        var preGravity = _gravityService.CalculateNormalGravity(prePose.Latitude, prePose.Altitude);
-        var preGn = new Vector(new double[] { 0, 0, preGravity });
+        var preGn = BuildGn(prePose.Latitude, prePose.Altitude);
         var deltav_gcork_n = (preGn - (2 * omega_ie_n + omega_en_n).OuterProduct(prePose.Velocity)) * dt;
         var velocity = prePose.Velocity + deltav_fk_n + deltav_gcork_n;
         var meanVel = 0.5 * (velocity + prePose.Velocity);
