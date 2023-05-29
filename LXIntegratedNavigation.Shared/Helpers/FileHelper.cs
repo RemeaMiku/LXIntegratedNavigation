@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LXIntegratedNavigation.Shared.Interfaces;
-using LXIntegratedNavigation.Shared.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿namespace LXIntegratedNavigation.Shared.Helpers;
 
-namespace LXIntegratedNavigation.Shared.Services;
-
-public class AscFileService
+public class FileHelper
 {
-
     private static IEnumerable<T> FileStreamReadLine<T>(string filePath, Func<string, T?> func)
     {
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -64,7 +53,7 @@ public class AscFileService
                 var gyroX = -double.Parse(record[7]) * gyroScaleFactor * samplingRate;
                 var gyroY = double.Parse(record[8]) * gyroScaleFactor * samplingRate;
                 var gyroZ = -double.Parse(record[6]) * gyroScaleFactor * samplingRate;
-                return new ImuData(new(week, sow), new(new double[] { accX, accY, accZ }), new(new double[] { gyroX, gyroY, gyroZ }));
+                return new ImuData(new(week, sow), new(accX, accY, accZ), new(gyroX, gyroY, gyroZ));
             }
             return null;
         };
@@ -100,7 +89,7 @@ public class AscFileService
             var yaw = Map(FromDegrees(double.Parse(values[11])), AngleRange.NegativeStraightToStraight);
             var pitch = FromDegrees(double.Parse(values[12]));
             var roll = FromDegrees(double.Parse(values[13]));
-            yield return new NavigationPose(new(week, sow), new(lat, lon, hgt), new(new[] { vn, ve, -vu }), new(yaw, pitch, roll));
+            yield return new NavigationPose(new(week, sow), new(lat, lon, hgt), new(vn, ve, -vu), new(yaw, pitch, roll));
         }
     }
 }

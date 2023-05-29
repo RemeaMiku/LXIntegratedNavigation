@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LXIntegratedNavigation.Shared.Interfaces;
+﻿namespace LXIntegratedNavigation.Shared.Services;
 
-namespace LXIntegratedNavigation.Shared.Services;
-
-public class Grs80NormalGravityModel : INormalGravityService
+public class Grs80NormalGravityService : INormalGravityService
 {
+    public EarthEllipsoid Ellipsoid => Grs80;
+
     public double NormalGravityAt(Angle latitude, double altitude)
     {
         var sin = Sin(latitude);

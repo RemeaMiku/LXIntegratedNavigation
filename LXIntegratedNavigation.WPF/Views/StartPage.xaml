@@ -27,13 +27,17 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBox Margin="0,0,10,0" Text="{Binding ImuFilePath}" />
-                <Button Grid.Column="1" Command="{Binding OpenImuFileCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Margin="0,0,5,0" Symbol="Folder24" />
-                        <TextBlock Text="浏览" />
-                    </StackPanel>
-                </Button>
+                <ui:TextBox
+                    Margin="0,0,10,0"
+                    PlaceholderText="填写本地IMU文件路径"
+                    Text="{Binding ImuFilePath}" />
+                <ui:Button
+                    Grid.Column="1"
+                    Command="{Binding OpenImuFileCommand}"
+                    Content="浏览"
+                    Foreground="{StaticResource MikuGreenBrush}"
+                    Icon="Folder24"
+                    IconForeground="{StaticResource MikuGreenBrush}" />
             </Grid>
             <TextBlock Style="{StaticResource TitleText}" Text="静态粗对准时段" />
             <Grid />

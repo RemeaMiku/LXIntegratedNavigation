@@ -6,7 +6,6 @@ global using static NaviSharp.EarthEllipsoid;
 global using static NaviSharp.Constants;
 global using Vector = NaviSharp.Vector<double>;
 global using Matrix = NaviSharp.Matrix<double>;
-global using LXIntegratedNavigation.Shared;
 global using LXIntegratedNavigation.Shared.Models;
+global using static LXIntegratedNavigation.Shared.Helpers.BuildHelper;
 global using LXIntegratedNavigation.Shared.Services;
-global using static LXIntegratedNavigation.Shared.Services.AscFileService;

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NaviSharp;
-
-namespace LXIntegratedNavigation.Shared.Models;
-
+﻿namespace LXIntegratedNavigation.Shared.Models;
+/// <summary>
+/// IMU数据结构，存储的是瞬时加速度和角速度
+/// </summary>
 public record class ImuData
 {
     public GpsTime TimeStamp { get; }
@@ -18,12 +13,14 @@ public record class ImuData
     public double GyroX => Gyroscope[0];
     public double GyroY => Gyroscope[1];
     public double GyroZ => Gyroscope[2];
-    public ImuData(GpsTime gpsTime, Vector accelerometer, Vector gyroscope)
+    public bool IsVirtual { get; set; }
+    public ImuData(GpsTime gpsTime, Vector accelerometer, Vector gyroscope, bool isVirtual = false)
     {
         TimeStamp = gpsTime;
         Accelerometer = accelerometer;
         Gyroscope = gyroscope;
         Accelerometer.IsColumn = false;
         Gyroscope.IsColumn = false;
+        IsVirtual = isVirtual;
     }
 }

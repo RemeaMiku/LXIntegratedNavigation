@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LXIntegratedNavigation.Shared.Models;
+﻿namespace LXIntegratedNavigation.Shared.Models;
 
 public record class NavigationPose
 {

@@ -101,6 +101,12 @@
                                     CanClose="True">
                                     <TextBlock Padding="5" Text="输出" />
                                 </LayoutAnchorable>
+                                <LayoutAnchorable
+                                    Title="统计"
+                                    CanAutoHide="False"
+                                    CanClose="True">
+                                    <TextBlock Padding="5" Text="统计" />
+                                </LayoutAnchorable>
                             </LayoutAnchorablePane>
                         </LayoutAnchorablePaneGroup>
                     </LayoutPanel>

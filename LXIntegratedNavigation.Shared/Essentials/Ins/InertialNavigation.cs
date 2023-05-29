@@ -1,40 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LXIntegratedNavigation.Shared.Interfaces;
-using LXIntegratedNavigation.Shared.Models;
-
-namespace LXIntegratedNavigation.Shared;
+﻿namespace LXIntegratedNavigation.Shared.Essentials;
 
 public class InertialNavigation
 {
     private readonly INormalGravityService _gravityService;
-    private readonly EarthEllipsoid _ellipsoid;
 
-    public InertialNavigation(INormalGravityService gravityService, EarthEllipsoid ellipsoid)
+    public InertialNavigation(INormalGravityService gravityService)
     {
         _gravityService = gravityService;
-        _ellipsoid = ellipsoid;
-    }
-
-    private Vector BuildGn(Angle latitude, double altitude) => new(new double[] { 0, 0, _gravityService.NormalGravityAt(latitude, altitude) });
-
-    private static Vector BuildOmega_ie_n(Angle latitude)
-    => new(new double[] { EarthRotationSpeed * Cos(latitude), 0, -EarthRotationSpeed * Sin(latitude) });
-
-    private Vector BuildOmega_en_n(Angle latitude, double altitude, double velNorth, double velEast)
-    {
-        var rm = _ellipsoid.M(latitude);
-        var rn = _ellipsoid.N(latitude);
-        return new(new double[] { velEast / (rn + altitude), -velNorth / (rm + altitude), -velEast * Tan(latitude) / (rn + altitude) });
     }
 
     public EulerAngle StaticAlignment(Angle initLatitude, double initAltitude, IEnumerable<ImuData> imuDatas)
     {
-        var gn = BuildGn(initLatitude, initAltitude);
+        var gn = _gravityService.NormalGravityAsVectorAt(initLatitude, initAltitude);
         var omega_ie_n = BuildOmega_ie_n(initLatitude);
         var v_g = gn.Unitization();
         var v_omega = gn.OuterProduct(omega_ie_n).Unitization();
@@ -45,8 +22,8 @@ public class InertialNavigation
         var meanGyroX = imuDatas.Average(data => data.GyroX);
         var meanGyroY = imuDatas.Average(data => data.GyroY);
         var meanGyroZ = imuDatas.Average(data => data.GyroZ);
-        var gb = -new Vector(new double[] { meanAccX, meanAccY, meanAccZ });
-        var omega_ie_b = new Vector(new double[] { meanGyroX, meanGyroY, meanGyroZ });
+        var gb = -new Vector(meanAccX, meanAccY, meanAccZ);
+        var omega_ie_b = new Vector(meanGyroX, meanGyroY, meanGyroZ);
         var w_g = gb.Unitization();
         var w_omega = gb.OuterProduct(omega_ie_b).Unitization();
         var w_gOmega = gb.OuterProduct(omega_ie_b).OuterProduct(gb).Unitization();
@@ -70,19 +47,19 @@ public class InertialNavigation
         var dtheta_pre = preImu.Gyroscope * dt;
         var deltav_fk_b = dv_cur + 0.5 * dtheta_cur.OuterProduct(dv_cur) + (dtheta_pre.OuterProduct(dv_cur) + dv_pre.OuterProduct(dtheta_cur)) / 12;
         var omega_ie_n = BuildOmega_ie_n(prePose.Latitude);
-        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.Altitude, prePose.NorthVelocity, prePose.EastVellocity);
+        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.Altitude, prePose.NorthVelocity, prePose.EastVellocity, _gravityService.Ellipsoid);
         var zeta = (omega_ie_n + omega_en_n) * dt;
         var preRotationMatrix = prePose.EulerAngle.ToRotationMatrix<double>();
         var deltav_fk_n = (Matrix.Identity(3) - 0.5 * Matrix.FromAxialVector(zeta)) * preRotationMatrix * deltav_fk_b;
-        var preGn = BuildGn(prePose.Latitude, prePose.Altitude);
+        var preGn = _gravityService.NormalGravityAsVectorAt(prePose.Latitude, prePose.Altitude);
         var deltav_gcork_n = (preGn - (2 * omega_ie_n + omega_en_n).OuterProduct(prePose.Velocity)) * dt;
         var velocity = prePose.Velocity + deltav_fk_n + deltav_gcork_n;
         var meanVel = 0.5 * (velocity + prePose.Velocity);
         var height = prePose.Altitude - meanVel[2] * dt;
         var meanHgt = 0.5 * (height + prePose.Altitude);
-        var latitude = prePose.B + meanVel[0] * dt / (_ellipsoid.M(prePose.Latitude) + meanHgt);
+        var latitude = prePose.B + meanVel[0] * dt / (_gravityService.Ellipsoid.M(prePose.Latitude) + meanHgt);
         var meanLat = 0.5 * (latitude + prePose.B);
-        var longitude = prePose.L + meanVel[1] * dt / ((_ellipsoid.N(meanLat) + meanHgt) * Cos(meanLat));
+        var longitude = prePose.L + meanVel[1] * dt / ((_gravityService.Ellipsoid.N(meanLat) + meanHgt) * Cos(meanLat));
         var phi_k = dtheta_cur + dtheta_pre.OuterProduct(dtheta_cur) / 12;
         var q_bk = phi_k.ToQuaternion();
         var q_nk1 = (-zeta).ToQuaternion();
@@ -92,9 +69,9 @@ public class InertialNavigation
         return new(curImu.TimeStamp, new(latitude, longitude, height), velocity, curEulerAngle);
     }
 
-    public IEnumerable<NavigationPose> Solve(NavigationPose initNagationPose, IEnumerable<ImuData> imuDatas, double? intervalSeconds = null)
+    public IEnumerable<NavigationPose> Solve(NavigationPose initPose, IEnumerable<ImuData> imuDatas, double? intervalSeconds = null)
     {
-        var prePose = initNagationPose;
+        var prePose = initPose;
         var preImu = imuDatas.First();
         yield return prePose;
         imuDatas = imuDatas.Skip(1);
