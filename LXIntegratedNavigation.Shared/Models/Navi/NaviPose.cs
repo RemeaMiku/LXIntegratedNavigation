@@ -1,14 +1,15 @@
-﻿namespace LXIntegratedNavigation.Shared.Models;
+﻿namespace LXIntegratedNavigation.Shared.Models.Navi;
 
-public record class NavigationPose
+public record class NaviPose
 {
     public GpsTime TimeStamp { get; set; }
-    public EulerAngle EulerAngle { get; set; }
+    public Orientation Orientation { get; set; }
+    public EulerAngles EulerAngles => Orientation.EulerAngles;
     public GeodeticCoord Location { get; set; }
     public Vector Velocity { get; set; }
-    public Angle Yaw => EulerAngle.Yaw;
-    public Angle Pitch => EulerAngle.Pitch;
-    public Angle Roll => EulerAngle.Roll;
+    public Angle Yaw => EulerAngles.Yaw;
+    public Angle Pitch => EulerAngles.Pitch;
+    public Angle Roll => EulerAngles.Roll;
 
     public double NorthVelocity => Velocity[0];
     public double GroundVelocity => Velocity[2];
@@ -20,11 +21,11 @@ public record class NavigationPose
     public double B => Location.B;
     public double L => Location.L;
 
-    public NavigationPose(GpsTime timeStamp, GeodeticCoord location, Vector velocity, EulerAngle eulerAngle)
+    public NaviPose(GpsTime timeStamp, GeodeticCoord location, Vector velocity, Orientation orientation)
     {
         TimeStamp = timeStamp;
         Location = location;
         Velocity = velocity;
-        EulerAngle = eulerAngle;
+        Orientation = orientation;
     }
 }

@@ -1,6 +1,9 @@
-﻿using LXIntegratedNavigation.Shared.Filters;
+﻿using LXIntegratedNavigation.Shared.Essentials.Ins;
+using LXIntegratedNavigation.Shared.Filters;
+using LXIntegratedNavigation.Shared.Models.Data;
+using LXIntegratedNavigation.Shared.Models.Navi;
 
-namespace LXIntegratedNavigation.Shared.Essentials;
+namespace LXIntegratedNavigation.Shared.Essentials.GnssIns;
 
 public class GnssInsLooseCombination
 {
@@ -25,19 +28,19 @@ public class GnssInsLooseCombination
         return new(currentTime, currentAcc, currentGyro, true);
     }
 
-    private NavigationPose UpDate(NavigationPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null, double? intervalSeconds = null)
+    private NaviPose UpDate(NaviPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null, double? intervalSeconds = null)
     {
         var dt = intervalSeconds ?? (curImu.TimeStamp - preImu.TimeStamp).TotalSeconds;
         var curPose = InertialNavigation.Mechanizations(prePose, preImu, curImu, dt);
         var Phi_kSub1Tok = BuildMatrixPhi(prePose, curImu, dt);
     }
 
-    private (Matrix H, Vector Z, Matrix R) BuildMeasurement(NavigationPose pose, ImuData imuData, GnssData gnssData)
+    private (Matrix H, Vector Z, Matrix R) BuildMeasurement(NaviPose pose, ImuData imuData, GnssData gnssData)
     {
 
     }
 
-    private Matrix BuildMatrixH_v(NavigationPose pose, ImuData imuData)
+    private Matrix BuildMatrixH_v(NaviPose pose, ImuData imuData)
     {
         var I = Matrix.Identity(3);
         var O = new Matrix(3, 3);
@@ -45,7 +48,7 @@ public class GnssInsLooseCombination
         var omega_ie_n = BuildOmega_ie_n(pose.Latitude);
         var omega_en_n = BuildOmega_en_n(pose.Latitude, pose.Altitude, pose.NorthVelocity, pose.EastVellocity, _gravityService.Ellipsoid);
         var omega_in_n = omega_ie_n + omega_en_n;
-        var C_b_n = pose.EulerAngle.ToRotationMatrix<double>();
+        var C_b_n = pose.EulerAngles.ToRotationMatrix<double>();
         var omega_in_nx = Matrix.FromAxialVector(omega_in_n);
         var lx = Matrix<double>.FromAxialVector(Storage.Config.L_Gnss);
         var diag_omega_ib_b = Matrix.FromVectorAsDiagonal(omega_ib_b);
@@ -60,7 +63,7 @@ public class GnssInsLooseCombination
     }
 
 
-    private Matrix BuildMatrixPhi(NavigationPose pose, ImuData imuData, double dt)
+    private Matrix BuildMatrixPhi(NaviPose pose, ImuData imuData, double dt)
     {
         var F_kSub1 = BuildMatrixF(pose, imuData);
         var I = Matrix.Identity(F_kSub1.RowCount);
@@ -68,7 +71,7 @@ public class GnssInsLooseCombination
         return Phi_kSub1Tok;
     }
 
-    private Matrix BuildMatrixF(NavigationPose pose, ImuData imuData)
+    private Matrix BuildMatrixF(NaviPose pose, ImuData imuData)
     {
         var f = imuData.Accelerometer;
         var omega_ib_b = imuData.Gyroscope;
@@ -93,7 +96,7 @@ public class GnssInsLooseCombination
         var sec2 = sec * sec;
         var sin = Sin(pose.Latitude);
         var v_n_2 = v_n * v_n;
-        var C_b_n = pose.EulerAngle.ToRotationMatrix<double>();
+        var C_b_n = pose.EulerAngles.ToRotationMatrix<double>();
         var F_rr = new Matrix(new double[,]
         {
             { -v_d/mAddh,0,v_n/mAddh },

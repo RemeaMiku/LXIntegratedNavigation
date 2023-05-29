@@ -1,4 +1,7 @@
-﻿namespace LXIntegratedNavigation.Shared.Essentials;
+﻿using LXIntegratedNavigation.Shared.Models.Data;
+using LXIntegratedNavigation.Shared.Models.Navi;
+
+namespace LXIntegratedNavigation.Shared.Essentials.Ins;
 
 public class InertialNavigation
 {
@@ -9,7 +12,7 @@ public class InertialNavigation
         _gravityService = gravityService;
     }
 
-    public EulerAngle StaticAlignment(Angle initLatitude, double initAltitude, IEnumerable<ImuData> imuDatas)
+    public Orientation StaticAlignment(Angle initLatitude, double initAltitude, IEnumerable<ImuData> imuDatas)
     {
         var gn = _gravityService.NormalGravityAsVectorAt(initLatitude, initAltitude);
         var omega_ie_n = BuildOmega_ie_n(initLatitude);
@@ -30,13 +33,13 @@ public class InertialNavigation
         var V = Matrix.FromVectorsAsColumns(v_g, v_omega, v_gOmega);
         var W = Matrix.FromVectorsAsRows(w_g, w_omega, w_gOmega);
         var rotationMatrix = V * W;
-        return rotationMatrix.ToEulerAngle();
+        return new(rotationMatrix);
     }
 
-    public EulerAngle StaticAlignment(GeodeticCoord initCoord, IEnumerable<ImuData> imuDatas)
+    public Orientation StaticAlignment(GeodeticCoord initCoord, IEnumerable<ImuData> imuDatas)
         => StaticAlignment(initCoord.Latitude, initCoord.Altitude, imuDatas);
 
-    public NavigationPose Mechanizations(NavigationPose prePose, ImuData preImu, ImuData curImu, double? intervalSeconds = null)
+    public NaviPose Mechanizations(NaviPose prePose, ImuData preImu, ImuData curImu, double? intervalSeconds = null)
     {
         var dt = intervalSeconds ?? (curImu.TimeStamp - preImu.TimeStamp).TotalSeconds;
         if (dt <= 0)
@@ -49,7 +52,7 @@ public class InertialNavigation
         var omega_ie_n = BuildOmega_ie_n(prePose.Latitude);
         var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.Altitude, prePose.NorthVelocity, prePose.EastVellocity, _gravityService.Ellipsoid);
         var zeta = (omega_ie_n + omega_en_n) * dt;
-        var preRotationMatrix = prePose.EulerAngle.ToRotationMatrix<double>();
+        var preRotationMatrix = prePose.Orientation.Matrix;
         var deltav_fk_n = (Matrix.Identity(3) - 0.5 * Matrix.FromAxialVector(zeta)) * preRotationMatrix * deltav_fk_b;
         var preGn = _gravityService.NormalGravityAsVectorAt(prePose.Latitude, prePose.Altitude);
         var deltav_gcork_n = (preGn - (2 * omega_ie_n + omega_en_n).OuterProduct(prePose.Velocity)) * dt;
@@ -63,13 +66,12 @@ public class InertialNavigation
         var phi_k = dtheta_cur + dtheta_pre.OuterProduct(dtheta_cur) / 12;
         var q_bk = phi_k.ToQuaternion();
         var q_nk1 = (-zeta).ToQuaternion();
-        var preQuaternion = prePose.EulerAngle.ToQuaternion<double>();
+        var preQuaternion = prePose.Orientation.Quaternion;
         var curQuaternion = q_nk1 * preQuaternion * q_bk;
-        var curEulerAngle = curQuaternion.ToRotationMatrix().ToEulerAngle();
-        return new(curImu.TimeStamp, new(latitude, longitude, height), velocity, curEulerAngle);
+        return new(curImu.TimeStamp, new(latitude, longitude, height), velocity, new(curQuaternion));
     }
 
-    public IEnumerable<NavigationPose> Solve(NavigationPose initPose, IEnumerable<ImuData> imuDatas, double? intervalSeconds = null)
+    public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, double? intervalSeconds = null)
     {
         var prePose = initPose;
         var preImu = imuDatas.First();

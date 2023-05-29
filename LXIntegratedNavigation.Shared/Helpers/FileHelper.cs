@@ -1,4 +1,7 @@
-﻿namespace LXIntegratedNavigation.Shared.Helpers;
+﻿using LXIntegratedNavigation.Shared.Models.Data;
+using LXIntegratedNavigation.Shared.Models.Navi;
+
+namespace LXIntegratedNavigation.Shared.Helpers;
 
 public class FileHelper
 {
@@ -60,13 +63,13 @@ public class FileHelper
         return FileStreamReadLine(filePath, func);
     }
 
-    public static void WritePoses(string filePath, IEnumerable<NavigationPose> poses)
+    public static void WritePoses(string filePath, IEnumerable<NaviPose> poses)
     {
-        var func = (NavigationPose pose) => $"{pose.TimeStamp.Week},{pose.TimeStamp.Sow:F2},{pose.Latitude.Degrees:F8},{pose.Longitude.Degrees:F8},{pose.Altitude:F4},{pose.NorthVelocity:F4},{pose.EastVellocity:F4},{pose.GroundVelocity:F4},{pose.Yaw.Degrees:F8},{pose.Pitch.Degrees:F8},{pose.Roll.Degrees:F8}";
+        var func = (NaviPose pose) => $"{pose.TimeStamp.Week},{pose.TimeStamp.Sow:F2},{pose.Latitude.Degrees:F8},{pose.Longitude.Degrees:F8},{pose.Altitude:F4},{pose.NorthVelocity:F4},{pose.EastVellocity:F4},{pose.GroundVelocity:F4},{pose.Yaw.Degrees:F8},{pose.Pitch.Degrees:F8},{pose.Roll.Degrees:F8}";
         FileStreamWriteLine(filePath, poses, func, "Week, Sow(s), Lat(deg), Lon(deg), Hgt(m), NorthVel(m / s), EastVel(m / s), DownVel(m / s), Yaw(deg), Pitch(deg), Roll(deg)");
     }
 
-    public static IEnumerable<NavigationPose> ReadPosFile(string filePath)
+    public static IEnumerable<NaviPose> ReadPosFile(string filePath)
     {
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         using var reader = new StreamReader(stream);
@@ -89,7 +92,7 @@ public class FileHelper
             var yaw = Map(FromDegrees(double.Parse(values[11])), AngleRange.NegativeStraightToStraight);
             var pitch = FromDegrees(double.Parse(values[12]));
             var roll = FromDegrees(double.Parse(values[13]));
-            yield return new NavigationPose(new(week, sow), new(lat, lon, hgt), new(vn, ve, -vu), new(yaw, pitch, roll));
+            yield return new NaviPose(new(week, sow), new(lat, lon, hgt), new(vn, ve, -vu), new(new EulerAngles(yaw, pitch, roll)));
         }
     }
 }
