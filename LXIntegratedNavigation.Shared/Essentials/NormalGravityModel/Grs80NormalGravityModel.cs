@@ -1,6 +1,6 @@
-﻿namespace LXIntegratedNavigation.Shared.Services;
+﻿namespace LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 
-public class Grs80NormalGravityService : INormalGravityService
+public class Grs80NormalGravityModel : INormalGravityService
 {
     public EarthEllipsoid Ellipsoid => Grs80;
 

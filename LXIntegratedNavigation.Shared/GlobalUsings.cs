@@ -10,5 +10,5 @@ global using Quaternion = NaviSharp.Quaternion<double>;
 global using LXIntegratedNavigation.Shared.Models;
 global using static LXIntegratedNavigation.Shared.Helpers.FileHelper;
 global using static LXIntegratedNavigation.Shared.Helpers.BuildHelper;
-global using LXIntegratedNavigation.Shared.Services;
-global using LXIntegratedNavigation.Shared.Essentials;
+global using LXIntegratedNavigation.Shared.Essentials.Navigation;
+global using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;

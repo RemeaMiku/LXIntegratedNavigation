@@ -1,17 +1,19 @@
-﻿namespace LXIntegratedNavigation.Shared.Essentials;
+﻿using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
+
+namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 
 public class InertialNavigation
 {
-    internal INormalGravityService _gravityService;
+    public INormalGravityModel GravityModel { get; init; }
 
-    public InertialNavigation(INormalGravityService gravityService)
+    public InertialNavigation(INormalGravityModel gravityService)
     {
-        _gravityService = gravityService;
+        GravityModel = gravityService;
     }
 
     public Orientation StaticAlignment(Angle initLatitude, double initAltitude, IEnumerable<ImuData> imuDatas)
     {
-        var gn = _gravityService.NormalGravityAsVectorAt(initLatitude, initAltitude);
+        var gn = GravityModel.NormalGravityAsVectorAt(initLatitude, initAltitude);
         var omega_ie_n = BuildOmega_ie_n(initLatitude);
         var v_g = gn.Unitization();
         var v_omega = gn.OuterProduct(omega_ie_n).Unitization();
@@ -36,10 +38,10 @@ public class InertialNavigation
     public Orientation StaticAlignment(GeodeticCoord initCoord, IEnumerable<ImuData> imuDatas)
         => StaticAlignment(initCoord.Latitude, initCoord.Altitude, imuDatas);
 
-    public NaviPose Mechanizations(NaviPose prePose, ImuData preImu, ImuData curImu)
+    public NaviPose Mechanizations(NaviPose prePose, ImuData preImu, ImuData curImu, double? intervalSeconds = null)
     {
-        var dt = curImu.IntervalSeconds;
-        if (dt < 0)
+        var dt = intervalSeconds ?? curImu.IntervalSeconds;
+        if (dt <= 0)
             throw new ArgumentException($"The timestamp of {nameof(curImu)}({curImu.TimeStamp}) should be after the {nameof(preImu)}({preImu.TimeStamp}).");
         var dv_cur = curImu.Accelerometer * dt;
         var dtheta_cur = curImu.Gyroscope * dt;
@@ -47,19 +49,19 @@ public class InertialNavigation
         var dtheta_pre = preImu.Gyroscope * dt;
         var deltav_fk_b = dv_cur + 0.5 * dtheta_cur.OuterProduct(dv_cur) + (dtheta_pre.OuterProduct(dv_cur) + dv_pre.OuterProduct(dtheta_cur)) / 12;
         var omega_ie_n = BuildOmega_ie_n(prePose.Latitude);
-        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.H, prePose.NorthVelocity, prePose.EastVellocity, _gravityService.Ellipsoid);
+        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.H, prePose.NorthVelocity, prePose.EastVellocity, GravityModel.Ellipsoid);
         var zeta = (omega_ie_n + omega_en_n) * dt;
         var preRotationMatrix = prePose.Orientation.Matrix;
         var deltav_fk_n = (Matrix.Identity(3) - 0.5 * Matrix.FromAxialVector(zeta)) * preRotationMatrix * deltav_fk_b;
-        var preGn = _gravityService.NormalGravityAsVectorAt(prePose.Latitude, prePose.H);
+        var preGn = GravityModel.NormalGravityAsVectorAt(prePose.Latitude, prePose.H);
         var deltav_gcork_n = (preGn - (2 * omega_ie_n + omega_en_n).OuterProduct(prePose.Velocity)) * dt;
         var velocity = prePose.Velocity + deltav_fk_n + deltav_gcork_n;
         var meanVel = 0.5 * (velocity + prePose.Velocity);
         var height = prePose.H - meanVel[2] * dt;
         var meanHgt = 0.5 * (height + prePose.H);
-        var latitude = prePose.B + meanVel[0] * dt / (_gravityService.Ellipsoid.M(prePose.Latitude) + meanHgt);
+        var latitude = prePose.B + meanVel[0] * dt / (GravityModel.Ellipsoid.M(prePose.Latitude) + meanHgt);
         var meanLat = 0.5 * (latitude + prePose.B);
-        var longitude = prePose.L + meanVel[1] * dt / ((_gravityService.Ellipsoid.N(meanLat) + meanHgt) * Cos(meanLat));
+        var longitude = prePose.L + meanVel[1] * dt / ((GravityModel.Ellipsoid.N(meanLat) + meanHgt) * Cos(meanLat));
         var phi_k = dtheta_cur + dtheta_pre.OuterProduct(dtheta_cur) / 12;
         var q_bk = phi_k.ToQuaternion();
         var q_nk1 = (-zeta).ToQuaternion();
@@ -76,7 +78,7 @@ public class InertialNavigation
         imuDatas = imuDatas.Skip(1);
         foreach (var curImu in imuDatas)
         {
-            var curPose = Mechanizations(prePose, preImu, curImu);
+            var curPose = Mechanizations(prePose, preImu, curImu, intervalSeconds);
             yield return curPose;
             prePose = curPose;
             preImu = curImu;

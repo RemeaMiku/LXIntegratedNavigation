@@ -8,7 +8,7 @@ var imuDatas = ReadImuDatas(imuDatasPath, TimeSpan.FromSeconds(0.01));
 var gnssDatas = ReadGnssDatas(gnssDatasPath);
 imuDatas = imuDatas.DistinctBy(data => data.TimeStamp);
 var initLocation = new GeodeticCoord(FromDegrees(30.5278108404), FromDegrees(114.3557126448), 22.312);
-var options = new GnssInsLooseCombinationOptions
+var options = new LooseCombinationOptions
     (
         StdInitR_n: 0.009,
         StdInitR_e: 0.008,
@@ -31,7 +31,7 @@ var options = new GnssInsLooseCombinationOptions
         RelevantTimeGyroBias: 3600,
         RelevantTimeGyroScale: 3600
     );
-var lc = new GnssInsLooseCombination(new Grs80NormalGravityService(), options);
+var lc = new LooseCombination(new Grs80NormalGravityModel(), options);
 const int samplingRate = 100;
 var staticEpochNum = 5 * 60 * samplingRate;
 var staticImuDatas = imuDatas.Take(staticEpochNum);

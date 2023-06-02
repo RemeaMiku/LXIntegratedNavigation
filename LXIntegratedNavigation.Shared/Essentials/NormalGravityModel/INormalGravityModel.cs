@@ -1,6 +1,6 @@
-﻿namespace LXIntegratedNavigation.Shared.Services;
+﻿namespace LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 
-public interface INormalGravityService
+public interface INormalGravityModel
 {
     public EarthEllipsoid Ellipsoid { get; }
     public double NormalGravityAt(Angle latitude, double altitude);
