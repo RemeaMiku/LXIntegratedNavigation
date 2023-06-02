@@ -1,4 +1,4 @@
-﻿namespace LXIntegratedNavigation.Shared.Models.Navi;
+﻿namespace LXIntegratedNavigation.Shared.Models;
 
 public record class NaviPose
 {
@@ -12,12 +12,12 @@ public record class NaviPose
     public Angle Roll => EulerAngles.Roll;
 
     public double NorthVelocity => Velocity[0];
-    public double GroundVelocity => Velocity[2];
+    public double DownVelocity => Velocity[2];
 
     public double EastVellocity => Velocity[1];
     public Angle Latitude => Location.Latitude;
     public Angle Longitude => Location.Longitude;
-    public double Altitude => Location.Altitude;
+    public double H => Location.Altitude;
     public double B => Location.B;
     public double L => Location.L;
 

@@ -52,7 +52,11 @@
                                     Storyboard.TargetProperty="Width"
                                     From="200"
                                     To="50"
-                                    Duration="0:0:0.3" />
+                                    Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <BackEase Amplitude="0.1" EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
@@ -65,7 +69,11 @@
                                     Storyboard.TargetProperty="Width"
                                     From="50"
                                     To="200"
-                                    Duration="0:0:0.3" />
+                                    Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <BackEase Amplitude="0.1" EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>

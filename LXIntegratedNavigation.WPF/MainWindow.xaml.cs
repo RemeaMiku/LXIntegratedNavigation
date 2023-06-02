@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using Wpf.Ui.Appearance;
 
 namespace LXIntegratedNavigation.WPF;
 
@@ -12,5 +13,6 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel(this);
+        Accent.Apply((Color)ColorConverter.ConvertFromString("#aa39c5bb"));
     }
 }

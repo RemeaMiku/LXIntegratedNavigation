@@ -19,13 +19,14 @@ internal partial class StartPageViewModel : ObservableObject
     }
     [ObservableProperty]
     string _imuFilePath = string.Empty;
+    public bool IsImuFilePathInfoBarOpen => !string.IsNullOrEmpty(ImuFilePath);
     [RelayCommand]
     void OpenImuFile()
     {
         var dialog = new OpenFileDialog()
         {
             Title = "打开IMU文件",
-            Filter = "NovatelASC文件(*.ASC)|*.ASC",
+            Filter = "Novatel ASC文件(*.ASC)|*.ASC",
             CheckFileExists = true,
             CheckPathExists = true,
             ReadOnlyChecked = true,
@@ -33,6 +34,7 @@ internal partial class StartPageViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             ImuFilePath = dialog.FileName;
+            OnPropertyChanged(nameof(IsImuFilePathInfoBarOpen));
         }
     }
 

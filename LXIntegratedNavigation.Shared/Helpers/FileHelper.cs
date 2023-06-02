@@ -1,7 +1,4 @@
-﻿using LXIntegratedNavigation.Shared.Models.Data;
-using LXIntegratedNavigation.Shared.Models.Navi;
-
-namespace LXIntegratedNavigation.Shared.Helpers;
+﻿namespace LXIntegratedNavigation.Shared.Helpers;
 
 public class FileHelper
 {
@@ -34,38 +31,55 @@ public class FileHelper
     public static string GetPathAtDesktop(string fileName)
     => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
 
-    public static IEnumerable<ImuData> ReadImuDatas(string filePath)
+    public static IEnumerable<ImuData> ReadImuDatas(string filePath, TimeSpan interval)
     {
         const double accScaleFactor = 0.05 / 32768;
         const double gyroScaleFactor = 0.1 / 3600 / 256;
-        const double samplingRate = 100;
-        var func = (string line) =>
+        var intervalSeconds = interval.TotalSeconds;
+        ImuData? preImu = null;
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using var reader = new StreamReader(stream);
+        while (!reader.EndOfStream)
         {
+            var line = reader.ReadLine();
+            if (line is null || string.IsNullOrWhiteSpace(line))
+                continue;
             var data = line.Trim().Split('*')[0].Split(';');
             if (data is null || data.Length == 0)
-                return null;
+                continue;
             var header = data[0].Split(',');
             var record = data[1].Split(',');
             if (header[0] == "%RAWIMUSA")
             {
                 var week = ushort.Parse(record[0]);
                 var sow = double.Parse(record[1]);
-                var accX = -double.Parse(record[4]) * accScaleFactor * samplingRate;
-                var accY = double.Parse(record[5]) * accScaleFactor * samplingRate;
-                var accZ = -double.Parse(record[3]) * accScaleFactor * samplingRate;
-                var gyroX = -double.Parse(record[7]) * gyroScaleFactor * samplingRate;
-                var gyroY = double.Parse(record[8]) * gyroScaleFactor * samplingRate;
-                var gyroZ = -double.Parse(record[6]) * gyroScaleFactor * samplingRate;
-                return new ImuData(new(week, sow), new(accX, accY, accZ), new(gyroX, gyroY, gyroZ));
+                var timeStamp = new GpsTime(week, sow);
+                var accX = -double.Parse(record[4]);
+                var accY = double.Parse(record[5]);
+                var accZ = -double.Parse(record[3]);
+                var gyroX = -double.Parse(record[7]);
+                var gyroY = double.Parse(record[8]);
+                var gyroZ = -double.Parse(record[6]);
+                var acc = new Vector(accX, accY, accZ) * accScaleFactor / intervalSeconds;
+                var gyro = new Vector(gyroX, gyroY, gyroZ) * gyroScaleFactor / intervalSeconds;
+                var imudata = new ImuData(timeStamp, intervalSeconds, acc, gyro);
+                if (preImu is not null && timeStamp - preImu.TimeStamp >= 1.1 * interval)
+                {
+                    (var former, var latter) = SplitImuData(preImu.TimeStamp, timeStamp, preImu.TimeStamp + interval, imudata);
+                    yield return former;
+                    yield return latter;
+                    preImu = latter;
+                    continue;
+                }
+                yield return imudata;
+                preImu = imudata;
             }
-            return null;
-        };
-        return FileStreamReadLine(filePath, func);
+        }
     }
 
     public static void WritePoses(string filePath, IEnumerable<NaviPose> poses)
     {
-        var func = (NaviPose pose) => $"{pose.TimeStamp.Week},{pose.TimeStamp.Sow:F2},{pose.Latitude.Degrees:F8},{pose.Longitude.Degrees:F8},{pose.Altitude:F4},{pose.NorthVelocity:F4},{pose.EastVellocity:F4},{pose.GroundVelocity:F4},{pose.Yaw.Degrees:F8},{pose.Pitch.Degrees:F8},{pose.Roll.Degrees:F8}";
+        var func = (NaviPose pose) => $"{pose.TimeStamp.Week},{pose.TimeStamp.Sow:F2},{pose.Latitude.Degrees:F8},{pose.Longitude.Degrees:F8},{pose.H:F4},{pose.NorthVelocity:F4},{pose.EastVellocity:F4},{pose.DownVelocity:F4},{pose.Yaw.Degrees:F8},{pose.Pitch.Degrees:F8},{pose.Roll.Degrees:F8}";
         FileStreamWriteLine(filePath, poses, func, "Week, Sow(s), Lat(deg), Lon(deg), Hgt(m), NorthVel(m / s), EastVel(m / s), DownVel(m / s), Yaw(deg), Pitch(deg), Roll(deg)");
     }
 
@@ -83,8 +97,8 @@ public class FileHelper
             var values = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var week = ushort.Parse(values[0]);
             var sow = double.Parse(values[1]);
-            var lat = double.Parse(values[2]);
-            var lon = double.Parse(values[3]);
+            var lat = FromDegrees(double.Parse(values[2]));
+            var lon = FromDegrees(double.Parse(values[3]));
             var hgt = double.Parse(values[4]);
             var ve = double.Parse(values[5]);
             var vn = double.Parse(values[6]);
@@ -93,6 +107,41 @@ public class FileHelper
             var pitch = FromDegrees(double.Parse(values[12]));
             var roll = FromDegrees(double.Parse(values[13]));
             yield return new NaviPose(new(week, sow), new(lat, lon, hgt), new(vn, ve, -vu), new(new EulerAngles(yaw, pitch, roll)));
+        }
+    }
+
+    //public static IEnumerable<T> ReadCsvFile<T>(string filePath, IDictionary<string, string> titlePropertyPairs, char separator = ',', int skipLines = 0)
+    //{
+
+    //}
+
+    public static IEnumerable<GnssData> ReadGnssDatas(string filePath)
+    {
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using var reader = new StreamReader(stream);
+        reader.ReadLine();
+        reader.ReadLine();
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (line is null || string.IsNullOrWhiteSpace(line))
+                continue;
+            var values = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var week = ushort.Parse(values[0]);
+            var sow = double.Parse(values[1]);
+            var lat = FromDegrees(double.Parse(values[2]));
+            var lon = FromDegrees(double.Parse(values[3]));
+            var hgt = double.Parse(values[4]);
+            var stdre = double.Parse(values[5]);
+            var stdrn = double.Parse(values[6]);
+            var stdru = double.Parse(values[7]);
+            var ve = double.Parse(values[8]);
+            var vn = double.Parse(values[9]);
+            var vu = double.Parse(values[10]);
+            var stdve = double.Parse(values[11]);
+            var stdvn = double.Parse(values[12]);
+            var stdvu = double.Parse(values[13]);
+            yield return new GnssData(new(week, sow), new(lat, lon, hgt), stdrn, stdre, stdru, new(vn, ve, -vu), stdvn, stdve, stdvu);
         }
     }
 }

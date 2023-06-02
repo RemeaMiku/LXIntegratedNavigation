@@ -19,8 +19,8 @@
             <Setter Property="FontFamily" Value="Microsoft Yahei UI Light" />
         </Style>
     </UserControl.Resources>
-    <UniformGrid Background="White">
-        <StackPanel Margin="20">
+    <ScrollViewer>
+        <StackPanel Margin="20,10">
             <TextBlock Style="{StaticResource TitleText}" Text="IMU文件路径" />
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -29,19 +29,60 @@
                 </Grid.ColumnDefinitions>
                 <ui:TextBox
                     Margin="0,0,10,0"
-                    PlaceholderText="填写本地IMU文件路径"
+                    PlaceholderText="填写IMU文件路径。支持Novatel ASC文件格式"
                     Text="{Binding ImuFilePath}" />
                 <ui:Button
                     Grid.Column="1"
+                    Appearance="Primary"
                     Command="{Binding OpenImuFileCommand}"
                     Content="浏览"
-                    Foreground="{StaticResource MikuGreenBrush}"
-                    Icon="Folder24"
-                    IconForeground="{StaticResource MikuGreenBrush}" />
+                    Icon="Folder24" />
             </Grid>
-            <TextBlock Style="{StaticResource TitleText}" Text="静态粗对准时段" />
-            <Grid />
+            <ui:InfoBar
+                IsOpen="{Binding IsImuFilePathInfoBarOpen}"
+                Message="成功读取"
+                Severity="Success" />
+            <TextBlock Style="{StaticResource TitleText}" Text="初始位置" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBox
+                    Margin="0,0,10,0"
+                    PlaceholderText="填写初始坐标。格式为：纬度(°),经度(°),大地高/X,Y,Z"
+                    Text="{Binding ImuFilePath}" />
+                <ui:ToggleSwitch Grid.Column="1" Content="是ECEF坐标" />
+            </Grid>
+            <ui:InfoBar Message="成功读取" Severity="Success" />
+            <TextBlock Style="{StaticResource TitleText}" Text="初始速度" />
+
+            <ui:TextBox Margin="0,0,10,0" PlaceholderText="填写初始速度。格式为：北向速度,东向速度,地向速度。不填为零速" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource TitleText}" Text="初始方向" />
+                <ui:ToggleSwitch Grid.Column="1" Content="使用静态粗对准获取" />
+            </Grid>
+
+            <ui:TextBox Margin="0,0,10,0" PlaceholderText="填写初始方向。格式为：航向(°),俯仰(°),横滚(°)。不填为均为0°" />
+
+            <TextBlock Style="{StaticResource TitleText}" Text="开始时刻" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBox Margin="0,0,10,0" PlaceholderText="选择格式并填写开始时刻。不填将从第一个开始解算。若开启静态粗对准，将从对准时刻后的第一个开始解算" />
+                <ComboBox Grid.Column="1" SelectedIndex="0">
+                    <ComboBoxItem Content="GPS周,GPS周内秒" />
+                    <ComboBoxItem Content="yyyy/MM/dd HH:mm:ss.ffffff" />
+                </ComboBox>
+            </Grid>
         </StackPanel>
-    </UniformGrid>
+    </ScrollViewer>
 
 </UserControl>

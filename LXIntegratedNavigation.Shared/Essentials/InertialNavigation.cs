@@ -1,11 +1,8 @@
-﻿using LXIntegratedNavigation.Shared.Models.Data;
-using LXIntegratedNavigation.Shared.Models.Navi;
-
-namespace LXIntegratedNavigation.Shared.Essentials.Ins;
+﻿namespace LXIntegratedNavigation.Shared.Essentials;
 
 public class InertialNavigation
 {
-    private readonly INormalGravityService _gravityService;
+    internal INormalGravityService _gravityService;
 
     public InertialNavigation(INormalGravityService gravityService)
     {
@@ -39,27 +36,27 @@ public class InertialNavigation
     public Orientation StaticAlignment(GeodeticCoord initCoord, IEnumerable<ImuData> imuDatas)
         => StaticAlignment(initCoord.Latitude, initCoord.Altitude, imuDatas);
 
-    public NaviPose Mechanizations(NaviPose prePose, ImuData preImu, ImuData curImu, double? intervalSeconds = null)
+    public NaviPose Mechanizations(NaviPose prePose, ImuData preImu, ImuData curImu)
     {
-        var dt = intervalSeconds ?? (curImu.TimeStamp - preImu.TimeStamp).TotalSeconds;
-        if (dt <= 0)
-            throw new ArgumentException($"The timestamp of{nameof(curImu)} should be after the {nameof(preImu)}.");
+        var dt = curImu.IntervalSeconds;
+        if (dt < 0)
+            throw new ArgumentException($"The timestamp of {nameof(curImu)}({curImu.TimeStamp}) should be after the {nameof(preImu)}({preImu.TimeStamp}).");
         var dv_cur = curImu.Accelerometer * dt;
         var dtheta_cur = curImu.Gyroscope * dt;
         var dv_pre = preImu.Accelerometer * dt;
         var dtheta_pre = preImu.Gyroscope * dt;
         var deltav_fk_b = dv_cur + 0.5 * dtheta_cur.OuterProduct(dv_cur) + (dtheta_pre.OuterProduct(dv_cur) + dv_pre.OuterProduct(dtheta_cur)) / 12;
         var omega_ie_n = BuildOmega_ie_n(prePose.Latitude);
-        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.Altitude, prePose.NorthVelocity, prePose.EastVellocity, _gravityService.Ellipsoid);
+        var omega_en_n = BuildOmega_en_n(prePose.Latitude, prePose.H, prePose.NorthVelocity, prePose.EastVellocity, _gravityService.Ellipsoid);
         var zeta = (omega_ie_n + omega_en_n) * dt;
         var preRotationMatrix = prePose.Orientation.Matrix;
         var deltav_fk_n = (Matrix.Identity(3) - 0.5 * Matrix.FromAxialVector(zeta)) * preRotationMatrix * deltav_fk_b;
-        var preGn = _gravityService.NormalGravityAsVectorAt(prePose.Latitude, prePose.Altitude);
+        var preGn = _gravityService.NormalGravityAsVectorAt(prePose.Latitude, prePose.H);
         var deltav_gcork_n = (preGn - (2 * omega_ie_n + omega_en_n).OuterProduct(prePose.Velocity)) * dt;
         var velocity = prePose.Velocity + deltav_fk_n + deltav_gcork_n;
         var meanVel = 0.5 * (velocity + prePose.Velocity);
-        var height = prePose.Altitude - meanVel[2] * dt;
-        var meanHgt = 0.5 * (height + prePose.Altitude);
+        var height = prePose.H - meanVel[2] * dt;
+        var meanHgt = 0.5 * (height + prePose.H);
         var latitude = prePose.B + meanVel[0] * dt / (_gravityService.Ellipsoid.M(prePose.Latitude) + meanHgt);
         var meanLat = 0.5 * (latitude + prePose.B);
         var longitude = prePose.L + meanVel[1] * dt / ((_gravityService.Ellipsoid.N(meanLat) + meanHgt) * Cos(meanLat));
@@ -75,11 +72,11 @@ public class InertialNavigation
     {
         var prePose = initPose;
         var preImu = imuDatas.First();
-        yield return prePose;
+        yield return initPose;
         imuDatas = imuDatas.Skip(1);
         foreach (var curImu in imuDatas)
         {
-            var curPose = Mechanizations(prePose, preImu, curImu, intervalSeconds);
+            var curPose = Mechanizations(prePose, preImu, curImu);
             yield return curPose;
             prePose = curPose;
             preImu = curImu;

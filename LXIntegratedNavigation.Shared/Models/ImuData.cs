@@ -1,12 +1,13 @@
 ﻿namespace LXIntegratedNavigation.Shared.Models;
-/// <summary>
-/// IMU数据结构，存储的是瞬时加速度和角速度
-/// </summary>
+
 public record class ImuData
 {
-    public GpsTime TimeStamp { get; }
-    public Vector Accelerometer { get; }
-    public Vector Gyroscope { get; }
+    public GpsTime TimeStamp { get; set; }
+    public double IntervalSeconds { get; set; }
+    public Vector Accelerometer { get; set; }
+    public Vector Gyroscope { get; set; }
+    public Vector DeltaVelocity => Accelerometer * IntervalSeconds;
+    public Vector DeltaAngular => Gyroscope * IntervalSeconds;
     public double AccX => Accelerometer[0];
     public double AccY => Accelerometer[1];
     public double AccZ => Accelerometer[2];
@@ -14,9 +15,10 @@ public record class ImuData
     public double GyroY => Gyroscope[1];
     public double GyroZ => Gyroscope[2];
     public bool IsVirtual { get; set; }
-    public ImuData(GpsTime gpsTime, Vector accelerometer, Vector gyroscope, bool isVirtual = false)
+    public ImuData(GpsTime gpsTime, double intervalSeconds, Vector accelerometer, Vector gyroscope, bool isVirtual = false)
     {
         TimeStamp = gpsTime;
+        IntervalSeconds = intervalSeconds;
         Accelerometer = accelerometer;
         Gyroscope = gyroscope;
         Accelerometer.IsColumn = false;

@@ -8,9 +8,6 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/Colors.xaml" />
-                <ResourceDictionary Source="Styles/Controls/MenuButtons.xaml" />
-                <ResourceDictionary Source="Styles/Windows/WindowTemplate.xaml" />
                 <!--  WPF UI  -->
                 <ResourceDictionary>
                     <ResourceDictionary.MergedDictionaries>
@@ -23,6 +20,9 @@
                         <Setter Property="FontFamily" Value="Microsoft Yahei UI Light" />
                     </Style>
                 </ResourceDictionary>
+                <ResourceDictionary Source="Styles/Colors.xaml" />
+                <ResourceDictionary Source="Styles/Controls/MenuButtons.xaml" />
+                <ResourceDictionary Source="Styles/Windows/WindowTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
