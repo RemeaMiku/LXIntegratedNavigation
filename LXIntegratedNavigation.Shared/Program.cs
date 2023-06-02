@@ -1,5 +1,5 @@
-﻿using System.Runtime.Serialization;
-using LXIntegratedNavigation.Shared.Essentials;
+﻿using LXIntegratedNavigation.Shared.Essentials.Navigation;
+using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 using LXIntegratedNavigation.Shared.Models;
 
 var imuDatasPath = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\wide_Rover\\20230511_wide_imu.ASC";
@@ -38,19 +38,8 @@ var staticImuDatas = imuDatas.Take(staticEpochNum);
 var initOriention = lc.InertialNavigation.StaticAlignment(initLocation, staticImuDatas);
 var dynamicImuDatas = imuDatas.Skip(staticEpochNum);
 var initImuData = dynamicImuDatas.First();
-//gnssDatas = gnssDatas.Where(data => data.TimeStamp >= initImuData.TimeStamp);
 var initPose = new NaviPose(dynamicImuDatas.First().TimeStamp, initLocation, new(3), initOriention);
 var lcRes = lc.Solve(initPose, dynamicImuDatas, gnssDatas);
-
-//var ins = new InertialNavigation(grs80GravityModel, Grs80);
-
-//var staticImuDatas = imuDatas.Where(data => data.TimeStamp < new GpsTime(2261, 360077.750));
-//var initEularAngle = ins.StaticAlignment(initCoord, staticImuDatas);
-//var dynamicImuDatas = imuDatas.Skip(staticImuDatas.Count());
-//var initPose = new NavigationPose(dynamicImuDatas.First().TimeStamp, initCoord, new(3), initEularAngle);
-//var insResult = ins.Solve(initPose, dynamicImuDatas, 0.01);
-//foreach (var pose in lcRes)
-//    WriteLine(pose);
 WritePoses(GetPathAtDesktop($"{Path.GetFileNameWithoutExtension(imuDatasPath)}InsResult_{DateTime.Now:yyMMddHHmmss}.csv"), lcRes);
 WriteLine("Done");
 

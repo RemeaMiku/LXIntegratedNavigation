@@ -1,7 +1,11 @@
-﻿namespace LXIntegratedNavigation.Shared.Helpers;
+﻿using LXIntegratedNavigation.Shared.Models;
+
+namespace LXIntegratedNavigation.Shared.Helpers;
 
 public class BuildHelper
 {
+    #region Public Methods
+
     public static Vector BuildOmega_ie_n(Angle latitude)
     => EarthRotationSpeed * new Vector(Cos(latitude), 0, -Sin(latitude));
 
@@ -19,4 +23,6 @@ public class BuildHelper
         var latter = new ImuData(endTime, (endTime - splitTime).TotalSeconds, imuData.Accelerometer, imuData.Gyroscope);
         return (former, latter);
     }
+
+    #endregion Public Methods
 }

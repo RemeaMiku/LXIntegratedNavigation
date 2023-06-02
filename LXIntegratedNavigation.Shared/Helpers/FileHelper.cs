@@ -1,32 +1,10 @@
-﻿namespace LXIntegratedNavigation.Shared.Helpers;
+﻿using LXIntegratedNavigation.Shared.Models;
+
+namespace LXIntegratedNavigation.Shared.Helpers;
 
 public class FileHelper
 {
-    private static IEnumerable<T> FileStreamReadLine<T>(string filePath, Func<string, T?> func)
-    {
-        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        using var reader = new StreamReader(stream);
-        while (!reader.EndOfStream)
-        {
-            var line = reader.ReadLine();
-            if (line is null || string.IsNullOrWhiteSpace(line))
-                continue;
-            var result = func(line);
-            if (result is null)
-                continue;
-            yield return result;
-        }
-    }
-
-    private static void FileStreamWriteLine<T>(string filePath, IEnumerable<T> values, Func<T, string> func, string? title)
-    {
-        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-        using var writer = new StreamWriter(stream);
-        if (title is not null)
-            writer.WriteLine(title);
-        foreach (var value in values)
-            writer.WriteLine(func(value));
-    }
+    #region Public Methods
 
     public static string GetPathAtDesktop(string fileName)
     => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
@@ -110,11 +88,6 @@ public class FileHelper
         }
     }
 
-    //public static IEnumerable<T> ReadCsvFile<T>(string filePath, IDictionary<string, string> titlePropertyPairs, char separator = ',', int skipLines = 0)
-    //{
-
-    //}
-
     public static IEnumerable<GnssData> ReadGnssDatas(string filePath)
     {
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -144,4 +117,41 @@ public class FileHelper
             yield return new GnssData(new(week, sow), new(lat, lon, hgt), stdrn, stdre, stdru, new(vn, ve, -vu), stdvn, stdve, stdvu);
         }
     }
+
+    #endregion Public Methods
+
+    #region Private Methods
+
+    private static IEnumerable<T> FileStreamReadLine<T>(string filePath, Func<string, T?> func)
+    {
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using var reader = new StreamReader(stream);
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (line is null || string.IsNullOrWhiteSpace(line))
+                continue;
+            var result = func(line);
+            if (result is null)
+                continue;
+            yield return result;
+        }
+    }
+
+    private static void FileStreamWriteLine<T>(string filePath, IEnumerable<T> values, Func<T, string> func, string? title)
+    {
+        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+        using var writer = new StreamWriter(stream);
+        if (title is not null)
+            writer.WriteLine(title);
+        foreach (var value in values)
+            writer.WriteLine(func(value));
+    }
+
+    #endregion Private Methods
+
+    //public static IEnumerable<T> ReadCsvFile<T>(string filePath, IDictionary<string, string> titlePropertyPairs, char separator = ',', int skipLines = 0)
+    //{
+
+    //}
 }

@@ -1,15 +1,26 @@
 ﻿using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
+using LXIntegratedNavigation.Shared.Models;
 
 namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 
 public class InertialNavigation
 {
-    public INormalGravityModel GravityModel { get; init; }
+    #region Public Constructors
 
     public InertialNavigation(INormalGravityModel gravityService)
     {
         GravityModel = gravityService;
     }
+
+    #endregion Public Constructors
+
+    #region Public Properties
+
+    public INormalGravityModel GravityModel { get; init; }
+
+    #endregion Public Properties
+
+    #region Public Methods
 
     public Orientation StaticAlignment(Angle initLatitude, double initAltitude, IEnumerable<ImuData> imuDatas)
     {
@@ -84,4 +95,6 @@ public class InertialNavigation
             preImu = curImu;
         }
     }
+
+    #endregion Public Methods
 }

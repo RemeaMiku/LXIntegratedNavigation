@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
+﻿using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 using LXIntegratedNavigation.Shared.Filters;
 using LXIntegratedNavigation.Shared.Models;
-using KalmanFilter = LXIntegratedNavigation.Shared.Filters.KalmanFilter;
 
 namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 

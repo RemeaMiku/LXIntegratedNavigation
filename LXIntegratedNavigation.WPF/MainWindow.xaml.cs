@@ -9,10 +9,14 @@ namespace LXIntegratedNavigation.WPF;
 /// </summary>
 public partial class MainWindow : Window
 {
+    #region Public Constructors
+
     public MainWindow()
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel(this);
         Accent.Apply((Color)ColorConverter.ConvertFromString("#aa39c5bb"));
     }
+
+    #endregion Public Constructors
 }

@@ -20,10 +20,14 @@ namespace LXIntegratedNavigation.WPF.Views
     /// </summary>
     public partial class StartPage : UserControl
     {
+        #region Public Constructors
+
         public StartPage()
         {
             InitializeComponent();
             DataContext = new StartPageViewModel(this);
         }
+
+        #endregion Public Constructors
     }
 }
