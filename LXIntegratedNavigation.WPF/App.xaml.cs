@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using LXIntegratedNavigation.WPF.Services;
 
 namespace LXIntegratedNavigation.WPF
 {
@@ -7,5 +8,6 @@ namespace LXIntegratedNavigation.WPF
     /// </summary>
     public partial class App : Application
     {
+
     }
 }

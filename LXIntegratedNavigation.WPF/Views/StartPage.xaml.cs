@@ -25,7 +25,7 @@ namespace LXIntegratedNavigation.WPF.Views
         public StartPage()
         {
             InitializeComponent();
-            DataContext = new StartPageViewModel(this);
+            DataContext = Provider.StartPageViewModel;
         }
 
         #endregion Public Constructors

@@ -1,16 +1,19 @@
-﻿using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
+﻿using System.Collections;
+using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 using LXIntegratedNavigation.Shared.Filters;
 using LXIntegratedNavigation.Shared.Models;
 
 namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 
-public class LooseCombination
+public partial class LooseCombination
 {
-    internal INormalGravityModel GravityModel => InertialNavigation.GravityModel;
+    public INormalGravityModel GravityModel => InertialNavigation.GravityModel;
     public InertialNavigation InertialNavigation { get; init; }
     public KalmanFilter Filter { get; init; }
     public LooseCombinationOptions Options { get; init; }
+
     readonly Matrix _q;
+
     public LooseCombination(INormalGravityModel gravityService, LooseCombinationOptions options)
     {
         InertialNavigation = new(gravityService);
@@ -41,19 +44,31 @@ public class LooseCombination
 
     private (NaviPose Pose, ImuData Imu) Update(NaviPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null)
     {
-        var curPose = InertialNavigation.Mechanizations(prePose, preImu, curImu);
+        var curPose = InertialNavigation.Mechanizations(prePose, preImu, curImu, Abs((curImu.TimeStamp - preImu.TimeStamp).TotalSeconds));
+        var gravity = GravityModel.NormalGravityAsVectorAt(curPose.Latitude, curPose.H);
+        var isZeroVelocity = IsZeroVelocity(curImu.Accelerometer, gravity);
         var Phi_kSub1Tok = BuildPhi(curPose, curImu);
         var I = Matrix.Identity(Phi_kSub1Tok.RowCount);
         if (curGnss is null)
         {
+            if (isZeroVelocity)
+            {
+                var HZR = BuildHZRFromZupt(curPose);
+                var (X_k, _) = Filter.Solve(I, Phi_kSub1Tok, HZR);
+                curPose = CorrectPose(X_k, curPose);
+                curImu = CorrectImuData(X_k, curImu);
+                Filter.X[0..9] = new(9);
+                Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
+                return (curPose, curImu);
+            }
             Filter.Solve(I, Phi_kSub1Tok);
             Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
             return (curPose, curImu);
         }
         else
         {
-            var measurement = BuildMeasurement(curPose, curImu, curGnss);
-            var (X_k, _) = Filter.Solve(I, Phi_kSub1Tok, measurement);
+            var HZR = BuildHZRFromGnss(curPose, curImu, curGnss);
+            var (X_k, _) = Filter.Solve(I, Phi_kSub1Tok, HZR);
             curPose = CorrectPose(X_k, curPose);
             curImu = CorrectImuData(X_k, curImu);
             Filter.X[0..9] = new(9);
@@ -62,7 +77,14 @@ public class LooseCombination
         }
     }
 
-    public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
+    //public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
+    //{
+    //    var poses = SolveForwards(initPose, imuDatas, gnssDatas);
+    //    poses = SolveBackwards(poses.Last(), imuDatas, gnssDatas);
+    //    return poses.Reverse();
+    //}
+
+    public IEnumerable<NaviPose> SolveForwards(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
     {
         yield return initPose;
         if (!imuDatas.Any())
@@ -72,7 +94,7 @@ public class LooseCombination
         var gnssIndex = gnssList.FindIndex(d => d.TimeStamp >= imuList[0].TimeStamp);
         var prePose = initPose;
         var preImu = imuList[0];
-        for (int imuIndex = 1; imuIndex < imuList.Count;)
+        for (var imuIndex = 1; imuIndex < imuList.Count;)
         {
             if (gnssIndex < gnssList.Count && Abs((gnssList[gnssIndex].TimeStamp - imuList[imuIndex].TimeStamp).TotalSeconds) <= 0.01)
             {
@@ -108,6 +130,54 @@ public class LooseCombination
             }
         }
     }
+
+    public IEnumerable<NaviPose> SolveBackwards(NaviPose finalPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
+    {
+        yield return finalPose;
+        if (!imuDatas.Any())
+            yield break;
+        var imuList = imuDatas.ToList();
+        var gnssList = gnssDatas.ToList();
+        var gnssIndex = gnssList.FindLastIndex(d => d.TimeStamp <= imuList[^1].TimeStamp);
+        var prePose = finalPose;
+        var preImu = imuList[^1];
+        for (var imuIndex = imuList.Count - 2; imuIndex >= 0;)
+        {
+            if (gnssIndex >= 0 && Abs((gnssList[gnssIndex].TimeStamp - imuList[imuIndex].TimeStamp).TotalSeconds) <= 0.01)
+            {
+                var curGnss = gnssList[gnssIndex];
+                var curImu = imuList[imuIndex];
+                (var curPose, curImu) = Update(prePose, preImu, curImu, curGnss);
+                yield return curPose;
+                imuIndex--;
+                gnssIndex--;
+                preImu = curImu;
+                prePose = curPose;
+                continue;
+            }
+            else if (gnssIndex >= 0 && gnssList[gnssIndex].TimeStamp > imuList[imuIndex].TimeStamp)
+            {
+                var curGnss = gnssList[gnssIndex];
+                (var curImu, imuList[imuIndex]) = SplitImuData(preImu.TimeStamp, curGnss.TimeStamp, curGnss.TimeStamp, imuList[imuIndex]);
+                (var curPose, curImu) = Update(prePose, preImu, curImu, curGnss);
+                yield return curPose;
+                gnssIndex--;
+                preImu = curImu;
+                prePose = curPose;
+                continue;
+            }
+            else
+            {
+                var curImu = imuList[imuIndex];
+                (var curPose, curImu) = Update(prePose, preImu, curImu);
+                yield return curPose;
+                imuIndex--;
+                preImu = curImu;
+                prePose = curPose;
+            }
+        }
+    }
+
 
     private Matrix BuildF(NaviPose pose, ImuData imuData)
     {
@@ -278,7 +348,7 @@ public class LooseCombination
     private static Matrix BuildR_v(GnssData gnssData)
         => Matrix.FromArrayAsDiagonal(Pow(gnssData.StdV_n, 2), Pow(gnssData.StdV_e, 2), Pow(gnssData.StdV_d, 2));
 
-    private (Matrix H, Vector Z, Matrix R) BuildMeasurement(NaviPose pose, ImuData imuData, GnssData gnssData)
+    private (Matrix H, Vector Z, Matrix R) BuildHZRFromGnss(NaviPose pose, ImuData imuData, GnssData gnssData)
     {
         var H_v = BuildH_v(pose, imuData);
         var Z_v = BuildZ_v(pose, gnssData);
@@ -291,6 +361,8 @@ public class LooseCombination
         var R = R_r.Combine(R_v, MatrixCombinationMode.Diagonal);
         return (H, Z, R);
     }
+
+
 
     private Vector BuildZ_r(NaviPose pose, GnssData gnssData)
     {
@@ -313,7 +385,7 @@ public class LooseCombination
         var S_a = Matrix.FromVectorAsDiagonal(s_a);
         var newAcc = imuData.Accelerometer - b_a - S_a * imuData.Accelerometer;
         var newGyro = imuData.Gyroscope - b_g - S_g * imuData.Gyroscope;
-        return imuData with { Accelerometer = newAcc, Gyroscope = newGyro };
+        return imuData with { Accelerometer = newAcc, Gyroscope = newGyro, IsVirtual = true };
     }
 
     private static NaviPose CorrectPose(Vector X, NaviPose pose)

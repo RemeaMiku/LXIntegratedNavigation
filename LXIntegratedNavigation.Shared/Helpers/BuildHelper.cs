@@ -19,8 +19,8 @@ public class BuildHelper
     public static (ImuData Former, ImuData Latter) SplitImuData(GpsTime startTime, GpsTime endTime, GpsTime splitTime, ImuData imuData)
     {
         var intervalSeconds = (splitTime - startTime).TotalSeconds;
-        var former = new ImuData(splitTime, intervalSeconds, imuData.Accelerometer, imuData.Gyroscope);
-        var latter = new ImuData(endTime, (endTime - splitTime).TotalSeconds, imuData.Accelerometer, imuData.Gyroscope);
+        var former = new ImuData(splitTime, intervalSeconds, imuData.Accelerometer, imuData.Gyroscope, true);
+        var latter = new ImuData(endTime, (endTime - splitTime).TotalSeconds, imuData.Accelerometer, imuData.Gyroscope, true);
         return (former, latter);
     }
 

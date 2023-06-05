@@ -1,5 +1,8 @@
-﻿namespace LXIntegratedNavigation.Shared.Models;
+﻿using System.Diagnostics;
 
+namespace LXIntegratedNavigation.Shared.Models;
+
+[DebuggerDisplay("{TimeStamp}, {Location}, VN = {NorthVelocity:F3}, VE = {EastVellocity:F3}, VD = {DownVelocity:F3}, {EulerAngles}")]
 public record class NaviPose
 {
     public GpsTime TimeStamp { get; set; }
@@ -28,4 +31,7 @@ public record class NaviPose
         Velocity = velocity;
         Orientation = orientation;
     }
+
+    public override string ToString()
+        => $"{TimeStamp},{Location},{NorthVelocity:F3},{EastVellocity:F3},{DownVelocity:F3},{EulerAngles}";
 }
