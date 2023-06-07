@@ -21,18 +21,21 @@ using Microsoft.Win32;
 using NaviSharp;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Interfaces;
+using Wpf.Ui.Mvvm.Contracts;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;
 
 #pragma warning disable 8603
 
-public partial class StartPageViewModel : ObservableValidator
+public partial class StartPageViewModel : ObservableValidator, IProgress<int>
 {
     readonly NavigationService _navigationService;
     readonly DataService _dataService;
-    public StartPageViewModel(DataService dataService, NavigationService navigationService)
+    readonly ISnackbarService _snackbarService;
+    public StartPageViewModel(ISnackbarService snackbarService, DataService dataService, NavigationService navigationService)
     {
+        _snackbarService = snackbarService;
         _dataService = dataService;
         _navigationService = navigationService;
     }
@@ -211,17 +214,17 @@ public partial class StartPageViewModel : ObservableValidator
         ValidateAllProperties();
         if (HasErrors)
         {
-            MessageBox.Show("填写存在错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            _snackbarService.Show("错误", "填写存在错误", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
             return;
         }
         if (!await _dataService.InitializeImuDatasAsync(ImuFilePath, TimeSpan.FromSeconds(ImuInterval)))
         {
-            MessageBox.Show("IMU文件读取出错", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            _snackbarService.Show("错误", "IMU文件读取出错", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
             return;
         }
         if (!await _dataService.InitializeGnssDatasAsync(GnssFilePath))
         {
-            MessageBox.Show("GNSS文件读取出错", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            _snackbarService.Show("错误", "GNSS文件读取出错", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
             return;
         }
         if (_dataService.ImuDatas is null || _dataService.GnssDatas is null)
@@ -229,6 +232,7 @@ public partial class StartPageViewModel : ObservableValidator
             MessageBox.Show("程序内部发生了一个错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             return;
         }
+        _snackbarService.Show("提示", "计算开始", SymbolRegular.Info28, ControlAppearance.Info);
         var initTime = string.IsNullOrEmpty(InitTimeText) ? _dataService.ImuDatas.First().TimeStamp : GpsTime.Parse(InitTimeText);
         var initLocation = GeodeticCoord.Parse(InitLocationText);
         var initVelocity = string.IsNullOrEmpty(InitVelocityText) ? new(3) : Vector.Parse(InitVelocityText);
@@ -241,6 +245,13 @@ public partial class StartPageViewModel : ObservableValidator
             initTime += span;
         }
         var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation);
-        naviData = await _navigationService.LooseCombinationAsync(naviData);
+        naviData = await _navigationService.LooseCombinationAsync(naviData, this);
+        _snackbarService.Show("成功", "计算完成", SymbolRegular.CheckmarkCircle48, ControlAppearance.Success);
+    }
+    [ObservableProperty]
+    double _progress = 0;
+    public void Report(int value)
+    {
+        Progress = value;
     }
 }

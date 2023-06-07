@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Wpf.Ui.Controls;
 
 namespace LXIntegratedNavigation.WPF.Views
 {
@@ -26,9 +27,11 @@ namespace LXIntegratedNavigation.WPF.Views
 
         public StartPage()
         {
-            InitializeComponent();
+
             DataContext = Provider.StartPageViewModel;
             ViewModel = Provider.StartPageViewModel;
+            InitializeComponent();
+            SnackbarService.SetSnackbarControl(Snackbar);
         }
 
         #endregion Public Constructors

@@ -10,3 +10,4 @@ global using System.Windows;
 global using MessageBox = System.Windows.MessageBox;
 global using static NaviSharp.Angle;
 global using static LXIntegratedNavigation.Shared.Helpers.FileHelper;
+global using Wpf.Ui.Common;

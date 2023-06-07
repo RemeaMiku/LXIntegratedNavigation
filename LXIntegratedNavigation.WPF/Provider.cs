@@ -11,11 +11,13 @@ namespace LXIntegratedNavigation.WPF;
 
 public static class Provider
 {
+    public static SnackbarService SnackbarService { get; set; } = new();
+
     public static DataService DataService { get; } = new();
 
     public static NavigationService NavigationService { get; } = new();
 
-    public static StartPageViewModel StartPageViewModel { get; } = new(DataService, NavigationService);
+    public static StartPageViewModel StartPageViewModel { get; } = new(SnackbarService, DataService, NavigationService);
     public static StartPage StartPage { get; } = new();
 
     public static DialogService DialogService { get; } = new();

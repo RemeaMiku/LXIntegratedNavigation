@@ -16,13 +16,13 @@ public class NavigationService
 {
     public InertialNavigation Ins { get; } = new(new Grs80NormalGravityModel());
 
-    public async Task<NavigationData> LooseCombinationAsync(NavigationData data)
+    public async Task<NavigationData> LooseCombinationAsync(NavigationData data, IProgress<int>? progress = null)
     {
         // Run the calculations on a background thread and await the result
         data.NaviPoses = await Task.Run(() =>
         {
             var lc = new LooseCombination(Ins, data.Options);
-            return lc.Solve(data.InitPose, data.ImuDatas, data.GnssDatas, data.InitTime).ToList();
+            return lc.Solve(data.InitPose, data.ImuDatas, data.GnssDatas, data.InitTime, progress).ToList();
         });
 #if DEBUG
         // Write the poses on the UI thread
@@ -31,5 +31,8 @@ public class NavigationService
         // Return the data
         return data;
     }
+
+    public event EventHandler<int>? ProgressChanged;
+
 
 }

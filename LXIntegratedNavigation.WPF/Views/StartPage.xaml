@@ -55,6 +55,7 @@
         </Grid.RowDefinitions>
         <Image
             Grid.RowSpan="2"
+            Opacity="0.831"
             Source="../Images/background.png"
             Stretch="UniformToFill" />
         <ui:DynamicScrollViewer>
@@ -115,8 +116,19 @@
                 <ui:CardExpander>
                     <ui:CardExpander.Header>
                         <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="FastAcceleration24" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="参数设定" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock Text="IMU初始误差" />
+                    </StackPanel>
+                </ui:CardExpander>
+                <ui:CardExpander>
+                    <ui:CardExpander.Header>
+                        <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="PlaySettings20" />
-                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="初始设定" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="解算设定" />
                         </StackPanel>
                     </ui:CardExpander.Header>
                     <StackPanel>
@@ -174,24 +186,36 @@
                             Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
                     </StackPanel>
                 </ui:CardExpander>
+
             </StackPanel>
         </ui:DynamicScrollViewer>
-        <ui:Card Grid.Row="1">
+        <ui:Card
+            Grid.Row="1"
+            Margin="5"
+            Padding="20,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ui:ProgressRing Progress="39" />
+                <ProgressBar Value="{Binding Progress}" />
                 <ui:Button
                     Grid.Column="1"
+                    Margin="20,0,0,0"
                     Appearance="Primary"
                     Command="{Binding StartCommand}"
                     Content="开始"
+                    FontSize="20"
                     Icon="Play48"
                     IconFilled="True" />
             </Grid>
         </ui:Card>
+        <ui:Snackbar
+            Name="Snackbar"
+            Panel.ZIndex="1000"
+            FontFamily="Microsoft Yahei UI Light"
+            FontSize="20"
+            Timeout="3900" />
     </Grid>
 
 </UserControl>

@@ -42,7 +42,7 @@ public partial class LooseCombination
                 Pow(Options.StdAccScale, 2), Pow(Options.StdAccScale, 2), Pow(Options.StdAccScale, 2)
             );
 
-    private (NaviPose Pose, ImuData Imu) Update(NaviPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null)
+    protected (NaviPose Pose, ImuData Imu) Update(NaviPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null)
     {
         var curPose = InertialNavigation.Mechanizations(prePose, preImu, curImu, Abs((curImu.TimeStamp - preImu.TimeStamp).TotalSeconds));
         var gravity = GravityModel.NormalGravityAsVectorAt(curPose.Latitude, curPose.H);
@@ -79,7 +79,7 @@ public partial class LooseCombination
 
 
 
-    public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas, GpsTime? initTime = null)
+    public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas, GpsTime? initTime = null, IProgress<int>? progress = null)
     {
         yield return initPose;
         if (!imuDatas.Any())
@@ -92,17 +92,7 @@ public partial class LooseCombination
         var prePose = initPose;
         var preImu = imuList[0];
         if (gnssIndex == -1)
-        {
-            for (var imuIndex = 1; imuIndex < imuList.Count;)
-            {
-                var curImu = imuList[imuIndex];
-                (var curPose, curImu) = Update(prePose, preImu, curImu);
-                yield return curPose;
-                imuIndex++;
-                preImu = curImu;
-                prePose = curPose;
-            }
-        }
+            gnssIndex = gnssList.Count;
         for (var imuIndex = 1; imuIndex < imuList.Count;)
         {
             if (gnssIndex < gnssList.Count && Abs((gnssList[gnssIndex].TimeStamp - imuList[imuIndex].TimeStamp).TotalSeconds) <= 0.01)
@@ -115,7 +105,6 @@ public partial class LooseCombination
                 gnssIndex++;
                 preImu = curImu;
                 prePose = curPose;
-                continue;
             }
             else if (gnssIndex < gnssList.Count && gnssList[gnssIndex].TimeStamp < imuList[imuIndex].TimeStamp)
             {
@@ -126,7 +115,6 @@ public partial class LooseCombination
                 gnssIndex++;
                 preImu = curImu;
                 prePose = curPose;
-                continue;
             }
             else
             {
@@ -137,6 +125,7 @@ public partial class LooseCombination
                 preImu = curImu;
                 prePose = curPose;
             }
+            progress?.Report(100 * imuIndex / imuList.Count);
         }
     }
 
