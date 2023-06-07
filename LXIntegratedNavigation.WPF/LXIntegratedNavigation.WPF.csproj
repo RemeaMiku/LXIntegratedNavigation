@@ -9,7 +9,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Models\" />
+	  <None Remove="Images\background.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Images\background.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -22,12 +22,20 @@ namespace LXIntegratedNavigation.WPF.Views
     {
         #region Public Constructors
 
+        public StartPageViewModel ViewModel { get; }
+
         public StartPage()
         {
             InitializeComponent();
             DataContext = Provider.StartPageViewModel;
+            ViewModel = Provider.StartPageViewModel;
         }
 
         #endregion Public Constructors
+
+        private void OrientationSwitch_Checked(object sender, RoutedEventArgs e)
+        {
+            ViewModel.InitOrientationText = string.Empty;
+        }
     }
 }

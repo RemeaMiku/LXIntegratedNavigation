@@ -77,23 +77,32 @@ public partial class LooseCombination
         }
     }
 
-    //public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
-    //{
-    //    var poses = SolveForwards(initPose, imuDatas, gnssDatas);
-    //    poses = SolveBackwards(poses.Last(), imuDatas, gnssDatas);
-    //    return poses.Reverse();
-    //}
 
-    public IEnumerable<NaviPose> SolveForwards(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
+
+    public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas, GpsTime? initTime = null)
     {
         yield return initPose;
         if (!imuDatas.Any())
             yield break;
+        if (initTime is not null)
+            imuDatas = imuDatas.Where(d => d.TimeStamp >= initTime);
         var imuList = imuDatas.ToList();
         var gnssList = gnssDatas.ToList();
         var gnssIndex = gnssList.FindIndex(d => d.TimeStamp >= imuList[0].TimeStamp);
         var prePose = initPose;
         var preImu = imuList[0];
+        if (gnssIndex == -1)
+        {
+            for (var imuIndex = 1; imuIndex < imuList.Count;)
+            {
+                var curImu = imuList[imuIndex];
+                (var curPose, curImu) = Update(prePose, preImu, curImu);
+                yield return curPose;
+                imuIndex++;
+                preImu = curImu;
+                prePose = curPose;
+            }
+        }
         for (var imuIndex = 1; imuIndex < imuList.Count;)
         {
             if (gnssIndex < gnssList.Count && Abs((gnssList[gnssIndex].TimeStamp - imuList[imuIndex].TimeStamp).TotalSeconds) <= 0.01)
@@ -131,52 +140,7 @@ public partial class LooseCombination
         }
     }
 
-    public IEnumerable<NaviPose> SolveBackwards(NaviPose finalPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
-    {
-        yield return finalPose;
-        if (!imuDatas.Any())
-            yield break;
-        var imuList = imuDatas.ToList();
-        var gnssList = gnssDatas.ToList();
-        var gnssIndex = gnssList.FindLastIndex(d => d.TimeStamp <= imuList[^1].TimeStamp);
-        var prePose = finalPose;
-        var preImu = imuList[^1];
-        for (var imuIndex = imuList.Count - 2; imuIndex >= 0;)
-        {
-            if (gnssIndex >= 0 && Abs((gnssList[gnssIndex].TimeStamp - imuList[imuIndex].TimeStamp).TotalSeconds) <= 0.01)
-            {
-                var curGnss = gnssList[gnssIndex];
-                var curImu = imuList[imuIndex];
-                (var curPose, curImu) = Update(prePose, preImu, curImu, curGnss);
-                yield return curPose;
-                imuIndex--;
-                gnssIndex--;
-                preImu = curImu;
-                prePose = curPose;
-                continue;
-            }
-            else if (gnssIndex >= 0 && gnssList[gnssIndex].TimeStamp > imuList[imuIndex].TimeStamp)
-            {
-                var curGnss = gnssList[gnssIndex];
-                (var curImu, imuList[imuIndex]) = SplitImuData(preImu.TimeStamp, curGnss.TimeStamp, curGnss.TimeStamp, imuList[imuIndex]);
-                (var curPose, curImu) = Update(prePose, preImu, curImu, curGnss);
-                yield return curPose;
-                gnssIndex--;
-                preImu = curImu;
-                prePose = curPose;
-                continue;
-            }
-            else
-            {
-                var curImu = imuList[imuIndex];
-                (var curPose, curImu) = Update(prePose, preImu, curImu);
-                yield return curPose;
-                imuIndex--;
-                preImu = curImu;
-                prePose = curPose;
-            }
-        }
-    }
+
 
 
     private Matrix BuildF(NaviPose pose, ImuData imuData)

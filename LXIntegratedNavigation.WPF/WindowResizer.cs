@@ -49,7 +49,7 @@ public class WindowResizer
     /// <summary>
     /// The transform matrix used to convert WPF sizes to screen pixels
     /// </summary>
-    private Matrix mTransformToDevice;
+    private System.Windows.Media.Matrix mTransformToDevice;
 
     /// <summary>
     /// The last screen the window was on
@@ -120,7 +120,7 @@ public class WindowResizer
         var source = PresentationSource.FromVisual(mWindow);
 
         // Reset the transform to default
-        mTransformToDevice = default(Matrix);
+        mTransformToDevice = default(System.Windows.Media.Matrix);
 
         // If we cannot get the source, ignore
         if (source == null)
@@ -161,7 +161,7 @@ public class WindowResizer
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         // We cannot find positioning until the window transform has been established
-        if (mTransformToDevice == default(Matrix))
+        if (mTransformToDevice == default(System.Windows.Media.Matrix))
             return;
 
         // Get the WPF size
@@ -257,7 +257,7 @@ public class WindowResizer
         var lCurrentScreen = MonitorFromPoint(lMousePosition, MonitorOptions.MONITOR_DEFAULTTONEAREST);
 
         // If this has changed from the last one, update the transform
-        if (lCurrentScreen != mLastScreen || mTransformToDevice == default(Matrix))
+        if (lCurrentScreen != mLastScreen || mTransformToDevice == default(System.Windows.Media.Matrix))
             GetTransform();
 
         // Store last know screen

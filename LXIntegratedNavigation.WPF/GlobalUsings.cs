@@ -5,3 +5,8 @@ global using static LXIntegratedNavigation.WPF.Provider;
 global using Orientation = NaviSharp.Orientation;
 global using Matrix = NaviSharp.Matrix<double>;
 global using Vector = NaviSharp.Vector<double>;
+global using NavigationService = LXIntegratedNavigation.WPF.Services.NavigationService;
+global using System.Windows;
+global using MessageBox = System.Windows.MessageBox;
+global using static NaviSharp.Angle;
+global using static LXIntegratedNavigation.Shared.Helpers.FileHelper;

@@ -96,9 +96,7 @@
                     <LayoutPanel Orientation="Vertical">
                         <LayoutDocumentPaneGroup>
                             <LayoutDocumentPane x:Name="DocumentPane">
-                                <LayoutDocument Title="开始">
-                                    <v:StartPage />
-                                </LayoutDocument>
+                                <LayoutDocument Title="开始" Content="{x:Static local:Provider.StartPage}" />
                             </LayoutDocumentPane>
                         </LayoutDocumentPaneGroup>
                         <LayoutAnchorablePaneGroup DockMinHeight="180" FloatingHeight="180">

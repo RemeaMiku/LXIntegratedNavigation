@@ -1,46 +1,175 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Xps.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LXIntegratedNavigation.Shared.Essentials.Navigation;
 using LXIntegratedNavigation.Shared.Models;
+using LXIntegratedNavigation.WPF.Converters;
+using LXIntegratedNavigation.WPF.Models;
 using LXIntegratedNavigation.WPF.Services;
 using Microsoft.Win32;
 using NaviSharp;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Controls.Interfaces;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;
 
-public partial class StartPageViewModel : ObservableObject
+#pragma warning disable 8603
+
+public partial class StartPageViewModel : ObservableValidator
 {
-    private readonly DataService _dataService;
-    public StartPageViewModel(DataService dataService)
+    readonly NavigationService _navigationService;
+    readonly DataService _dataService;
+    public StartPageViewModel(DataService dataService, NavigationService navigationService)
     {
         _dataService = dataService;
+        _navigationService = navigationService;
     }
-    [ObservableProperty]
-    string _imuFilePath = string.Empty;
-    [ObservableProperty]
-    string _imuIntervalText = string.Empty;
-    [ObservableProperty]
+#if DEBUG
+    string _imuFilePath = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\wide_Rover\\20230511_wide_imu.ASC";
+    string _gnssFilePath = "D:\\onedrive\\文档\\Tencent Files\\1597638582\\FileRecv\\wide.pos";
+    double _imuInterval = 0.01;
     string _initTimeText = string.Empty;
-    [ObservableProperty]
-    string _initLocationText = string.Empty;
-    [ObservableProperty]
+    string _initLocationText = "30.5278108404, 114.3557126448, 22.312";
     string _initVelocityText = string.Empty;
-    [ObservableProperty]
     string _initOrientationText = string.Empty;
+    double _staticDuration = 300;
+#endif
+#if RELEASE
+    string _imuFilePath = string.Empty;
+    string _gnssFilePath = string.Empty;
+    double _imuInterval = 0.01;
+    string _initTimeText = string.Empty;
+    string _initLocationText = string.Empty;
+    string _initVelocityText = string.Empty;
+    string _initOrientationText = string.Empty;
+    double _staticDuration = 0;
+#endif
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
+    public string ImuFilePath
+    {
+        get => _imuFilePath;
+        set => SetProperty(ref _imuFilePath, value, true);
+    }
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
+    public string GnssFilePath
+    {
+        get => _gnssFilePath;
+        set => SetProperty(ref _gnssFilePath, value, true);
+    }
+
+    [Range(0.0001, 1, ErrorMessage = "必须在0.0001到1范围内")]
+    public double ImuInterval
+    {
+        get => _imuInterval;
+        set => SetProperty(ref _imuInterval, value, true);
+    }
+
+    public static ValidationResult ValidateFilePath(string imuFilePath)
+    {
+        if (string.IsNullOrEmpty(imuFilePath))
+            return new ValidationResult("不能为空");
+        try
+        {
+            var isvalid = new FileInfo(imuFilePath).Exists;
+            if (isvalid)
+            {
+                return ValidationResult.Success;
+            }
+            return new ValidationResult("路径非法");
+        }
+        catch (Exception)
+        {
+            return new ValidationResult("路径非法");
+        }
+    }
+
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateGpsTime))]
+    public string InitTimeText
+    {
+        get => _initTimeText;
+        set => SetProperty(ref _initTimeText, value, true);
+    }
+    public static ValidationResult ValidateGpsTime(string str)
+    {
+        if (string.IsNullOrEmpty(str) || GpsTime.TryParse(str, null, out _))
+            return ValidationResult.Success;
+        return new ValidationResult("格式有误");
+    }
+    public static ValidationResult ValidateLocation(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            return new ValidationResult("不能为空");
+        if (GeodeticCoord.TryParse(str, null, out _))
+            return ValidationResult.Success;
+        return new ValidationResult("格式有误");
+    }
+
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateLocation))]
+    public string InitLocationText
+    {
+        get => _initLocationText;
+        set => SetProperty(ref _initLocationText, value, true);
+    }
+
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVelocity))]
+    public string InitVelocityText
+    {
+        get => _initVelocityText;
+        set => SetProperty(ref _initVelocityText, value, true);
+    }
+
+    public static ValidationResult ValidateVelocity(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            return ValidationResult.Success;
+        if (Vector.TryParse(str, null, out var vel) && vel.IsSizeOf(3))
+        {
+            return ValidationResult.Success;
+        }
+        return new ValidationResult("格式有误");
+    }
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateOrientation))]
+    public string InitOrientationText
+    {
+        get => _initOrientationText;
+        set => SetProperty(ref _initOrientationText, value, true);
+    }
+
+    public static ValidationResult ValidateOrientation(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            return ValidationResult.Success;
+        if (EulerAngles.TryParse(str, null, out _))
+        {
+            return ValidationResult.Success;
+        }
+        return new ValidationResult("格式有误");
+    }
+
+    [Range(0, double.MaxValue, ErrorMessage = $"必须>=0")]
+    public double StaticDuration
+    {
+        get => _staticDuration;
+        set => SetProperty(ref _staticDuration, value, true);
+    }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsFromTextBox))]
     bool _isFromStaticAlignment = true;
     [ObservableProperty]
-    int _selectedIndex = 0;
-
-
+    double? _staticSeconds;
     public bool IsFromTextBox => !IsFromStaticAlignment;
 
     [RelayCommand]
@@ -59,58 +188,59 @@ public partial class StartPageViewModel : ObservableObject
             ImuFilePath = dialog.FileName;
         }
     }
+
     [RelayCommand]
-    async void StartAsync()
+    void OpenGnssFile()
     {
-        var interval = double.Parse(ImuIntervalText);
-
-        await _dataService.InitializeImuDatas(ImuFilePath, TimeSpan.FromSeconds(interval));
-        _dataService.InitTime = ParseInitTime();
-        _dataService.InitLocation = ParseInitLocation();
-        _dataService.InitVelocity = ParseInitVeclocity();
-        _dataService.InitOrientation = ParseInitOrientation();
-    }
-
-    GpsTime ParseInitTime()
-    {
-        if (string.IsNullOrEmpty(InitTimeText))
-            return _dataService.ImuDatas.First().TimeStamp;
-        switch (SelectedIndex)
+        var dialog = new OpenFileDialog()
         {
-            case 0:
-                var values = InitTimeText.Split(',');
-                var week = ushort.Parse(values[0]);
-                var sow = double.Parse(values[1]);
-                return new(week, sow);
-            case 1:
-                return GpsTime.FromUtc(UtcTime.ParseExact(InitTimeText, "yyyy/MM/dd HH:mm:ss.ffffff", null));
-            default:
-                throw new NotImplementedException();
+            Title = "打开GNSS文件",
+            CheckFileExists = true,
+            CheckPathExists = true,
+            ReadOnlyChecked = true,
+        };
+        if (dialog.ShowDialog() == true)
+        {
+            GnssFilePath = dialog.FileName;
         }
     }
 
-    GeodeticCoord ParseInitLocation()
+    [RelayCommand]
+    async Task StartAsync()
     {
-        var values = InitLocationText.Split(",");
-        var lat = double.Parse(values[0]);
-        var lon = double.Parse(values[1]);
-        var h = double.Parse(values[2]);
-        return new(Angle.FromDegrees(lat), Angle.FromDegrees(lon), h);
-    }
-    Vector ParseInitVeclocity()
-    {
-        var values = InitVelocityText.Split(",");
-        var v_n = double.Parse(values[0]);
-        var v_e = double.Parse(values[1]);
-        var v_d = double.Parse(values[2]);
-        return new(v_n, v_e, v_d);
-    }
-    Orientation ParseInitOrientation()
-    {
-        var values = InitOrientationText.Split(",");
-        var yaw = Angle.FromDegrees(double.Parse(values[0]));
-        var pitch = Angle.FromDegrees(double.Parse(values[1]));
-        var roll = Angle.FromDegrees(double.Parse(values[2]));
-        return new(new EulerAngles(yaw, pitch, roll));
+        ValidateAllProperties();
+        if (HasErrors)
+        {
+            MessageBox.Show("填写存在错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            return;
+        }
+        if (!await _dataService.InitializeImuDatasAsync(ImuFilePath, TimeSpan.FromSeconds(ImuInterval)))
+        {
+            MessageBox.Show("IMU文件读取出错", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            return;
+        }
+        if (!await _dataService.InitializeGnssDatasAsync(GnssFilePath))
+        {
+            MessageBox.Show("GNSS文件读取出错", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            return;
+        }
+        if (_dataService.ImuDatas is null || _dataService.GnssDatas is null)
+        {
+            MessageBox.Show("程序内部发生了一个错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            return;
+        }
+        var initTime = string.IsNullOrEmpty(InitTimeText) ? _dataService.ImuDatas.First().TimeStamp : GpsTime.Parse(InitTimeText);
+        var initLocation = GeodeticCoord.Parse(InitLocationText);
+        var initVelocity = string.IsNullOrEmpty(InitVelocityText) ? new(3) : Vector.Parse(InitVelocityText);
+        var initOrientation = new Orientation(default(EulerAngles));
+        if (IsFromStaticAlignment)
+        {
+            var span = TimeSpan.FromSeconds(StaticDuration);
+            var staticImuDatas = _dataService.ImuDatas.Where(d => d.TimeStamp >= initTime && d.TimeStamp < initTime + span).ToList();
+            initOrientation = _navigationService.Ins.StaticAlignment(initLocation, staticImuDatas);
+            initTime += span;
+        }
+        var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation);
+        naviData = await _navigationService.LooseCombinationAsync(naviData);
     }
 }

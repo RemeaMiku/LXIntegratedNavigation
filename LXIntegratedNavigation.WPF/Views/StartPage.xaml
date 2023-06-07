@@ -2,101 +2,196 @@
     x:Class="LXIntegratedNavigation.WPF.Views.StartPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cv="clr-namespace:LXIntegratedNavigation.WPF.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:l="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    d:DataContext="{x:Static local:Locator.StartPageViewModel}"
-    d:DesignHeight="650"
-    d:DesignWidth="800"
+    d:DataContext="{x:Static local:Provider.StartPageViewModel}"
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="0,5" />
+            <Setter Property="Margin" Value="0" />
             <Setter Property="Padding" Value="0,10" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="16" />
             <Setter Property="FontFamily" Value="Microsoft Yahei UI Light" />
         </Style>
+        <Style x:Key="TextBlockHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+            <Setter Property="FontFamily" Value="Microsoft Yahei UI Light" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style
+            x:Key="SymbolHeaderStyle"
+            BasedOn="{StaticResource {x:Type ui:SymbolIcon}}"
+            TargetType="ui:SymbolIcon">
+            <Setter Property="Filled" Value="True" />
+            <Setter Property="Foreground" Value="{StaticResource MikuGreenBrushAA}" />
+            <Setter Property="FontSize" Value="40" />
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type ui:TextBox}}" TargetType="ui:TextBox">
+            <Setter Property="Margin" Value="0,0,0,15" />
+        </Style>
+        <ControlTemplate x:Key="ErrorInfoTemplate">
+            <StackPanel>
+                <AdornedElementPlaceholder x:Name="Ad" />
+                <ui:Card
+                    Height="20"
+                    Padding="0"
+                    Background="{StaticResource MikuRedBrush55}">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Foreground="{StaticResource MikuRedBrush}" Symbol="ErrorCircle16" />
+                        <TextBlock Text="{Binding ElementName=Ad, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" />
+                    </StackPanel>
+                </ui:Card>
+            </StackPanel>
+        </ControlTemplate>
     </UserControl.Resources>
-    <ScrollViewer>
-        <StackPanel Margin="20,10">
-            <TextBlock Text="IMU文件路径" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Image
+            Grid.RowSpan="2"
+            Source="../Images/background.png"
+            Stretch="UniformToFill" />
+        <ui:DynamicScrollViewer>
+            <StackPanel Margin="10">
+                <ui:CardExpander>
+                    <ui:CardExpander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="DocumentAdd48" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="文件导入" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock Text="IMU采样间隔(s)" />
+                        <ui:TextBox
+                            PlaceholderText="填写IMU采样间隔。单位为秒"
+                            Text="{Binding ImuInterval}"
+                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                        <TextBlock Text="IMU文件路径" />
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                Margin="0"
+                                PlaceholderText="填写IMU输出文件路径。支持Novatel ASC文件格式"
+                                Text="{Binding ImuFilePath}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                Appearance="Primary"
+                                Command="{Binding OpenImuFileCommand}"
+                                Content="浏览"
+                                Icon="Folder24" />
+                        </Grid>
+                        <TextBlock Text="GNSS文件路径" />
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                Margin="0"
+                                PlaceholderText="填写GNSS结果文件路径"
+                                Text="{Binding GnssFilePath}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                Appearance="Primary"
+                                Command="{Binding OpenGnssFileCommand}"
+                                Content="浏览"
+                                Icon="Folder24" />
+                        </Grid>
+                    </StackPanel>
+                </ui:CardExpander>
+                <ui:CardExpander>
+                    <ui:CardExpander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="PlaySettings20" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="初始设定" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock Text="初始时刻(GPS周,GPS秒)" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                PlaceholderText="填写开始时刻。不填将从第一个开始解算"
+                                Text="{Binding InitTimeText}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                        </Grid>
+                        <TextBlock Text="初始位置(纬度,经度,大地高)" />
+
+                        <ui:TextBox
+                            PlaceholderText="填写大地坐标。格式：纬度(°),经度(°),大地高"
+                            Text="{Binding InitLocationText}"
+                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+
+
+                        <TextBlock Text="初始速度(北向,东向,地向)" />
+
+                        <ui:TextBox
+                            PlaceholderText="填写初始速度。格式为：北向速度,东向速度,地向速度。不填为零速"
+                            Text="{Binding InitVelocityText}"
+                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="初始方向(航向,俯仰,横滚)" />
+                            <ui:ToggleSwitch
+                                Name="OrientationSwitch"
+                                Grid.Column="1"
+                                Checked="OrientationSwitch_Checked"
+                                Content="使用静态粗对准获取"
+                                IsChecked="{Binding IsFromStaticAlignment}" />
+                        </Grid>
+
+                        <ui:TextBox
+                            Name="InitOrientationTextBox"
+                            IsEnabled="{Binding IsFromTextBox}"
+                            PlaceholderText="填写初始方向。格式为：航向(°),俯仰(°),横滚(°)。不填为均为0°"
+                            Text="{Binding InitOrientationText}"
+                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                        <TextBlock Text="静态粗对准时长(s)" />
+                        <ui:TextBox
+                            IsEnabled="{Binding IsFromStaticAlignment}"
+                            PlaceholderText="填写对准时长"
+                            Text="{Binding StaticDuration}"
+                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                    </StackPanel>
+                </ui:CardExpander>
+            </StackPanel>
+        </ui:DynamicScrollViewer>
+        <ui:Card Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ui:TextBox
-                    Margin="0,0,10,0"
-                    PlaceholderText="填写IMU文件路径。支持Novatel ASC文件格式"
-                    Text="{Binding ImuFilePath}" />
+                <ui:ProgressRing Progress="39" />
                 <ui:Button
                     Grid.Column="1"
                     Appearance="Primary"
-                    Command="{Binding OpenImuFileCommand}"
-                    Content="浏览"
-                    Icon="Folder24" />
+                    Command="{Binding StartCommand}"
+                    Content="开始"
+                    Icon="Play48"
+                    IconFilled="True" />
             </Grid>
-            <TextBlock Text="IMU采样间隔" />
-            <ui:TextBox PlaceholderText="填写IMU采样间隔。单位为秒" Text="{Binding ImuIntervalText}" />
-            <TextBlock Text="初始时刻" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:TextBox
-                    Margin="0,0,10,0"
-                    PlaceholderText="选择格式并填写开始时刻。不填将从第一个开始解算"
-                    Text="{Binding InitTimeText}" />
-                <ComboBox Grid.Column="1" SelectedIndex="{Binding SelectedIndex}">
-                    <ComboBoxItem Content="GPS周,GPS周内秒" Tag="GpsTime" />
-                    <ComboBoxItem Content="yyyy/MM/dd HH:mm:ss.ffffff" Tag="UtcTime" />
-                </ComboBox>
-            </Grid>
-            <TextBlock Text="初始位置" />
+        </ui:Card>
+    </Grid>
 
-            <ui:TextBox
-                Margin="0,0,10,0"
-                PlaceholderText="填写大地坐标。格式：纬度(°),经度(°),大地高"
-                Text="{Binding InitLocationText}" />
-
-
-            <TextBlock Text="初始速度" />
-
-            <ui:TextBox
-                Margin="0,0,10,0"
-                PlaceholderText="填写初始速度。格式为：北向速度,东向速度,地向速度。不填为零速"
-                Text="{Binding InitVelocityText}" />
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="初始方向" />
-                <ui:ToggleSwitch
-                    Name="OrientationSwitch"
-                    Grid.Column="1"
-                    Content="使用静态粗对准获取"
-                    IsChecked="{Binding IsFromStaticAlignment}" />
-            </Grid>
-
-            <ui:TextBox
-                Margin="0,0,10,0"
-                IsEnabled="{Binding IsFromTextBox}"
-                PlaceholderText="填写初始方向。格式为：航向(°),俯仰(°),横滚(°)。不填为均为0°"
-                Text="{Binding InitOrientationText}" />
-            <TextBlock Text="静态粗对准" />
-            <ui:TextBox IsEnabled="{Binding IsFromStaticAlignment}" PlaceholderText="填写对准时长" />
-            <ui:Button
-                Margin="20"
-                Padding="50,10"
-                HorizontalAlignment="Center"
-                Appearance="Primary"
-                Command="{Binding StartAsyncCommand}"
-                Content="开始" />
-        </StackPanel>
-    </ScrollViewer>
 </UserControl>
