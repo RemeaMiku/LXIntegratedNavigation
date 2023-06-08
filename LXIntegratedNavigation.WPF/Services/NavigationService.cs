@@ -32,7 +32,5 @@ public class NavigationService
         return data;
     }
 
-    public event EventHandler<int>? ProgressChanged;
-
 
 }

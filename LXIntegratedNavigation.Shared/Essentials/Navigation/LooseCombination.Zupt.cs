@@ -7,14 +7,19 @@ using LXIntegratedNavigation.Shared.Models;
 
 namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 
+
 public partial class LooseCombination
 {
     readonly Queue<Vector> _accelerationWindow = new();
     const double _accelerationThreshold = 0.1;
     const double _windowSize = 50;
 
-    Matrix _H_v = BuildH_v();
-    Matrix _R_v = BuildR_v();
+#pragma warning disable IDE1006 // 命名样式
+    static readonly Matrix _H_v = BuildH_v();
+#pragma warning restore IDE1006 // 命名样式
+#pragma warning disable IDE1006 // 命名样式
+    static readonly Matrix _R_v = BuildR_v();
+#pragma warning restore IDE1006 // 命名样式
 
     private bool IsZeroVelocity(Vector accelerometer, Vector normalGravity)
     {
@@ -44,6 +49,6 @@ public partial class LooseCombination
     private static Vector BuildZ_v(NaviPose pose)
         => new(pose.NorthVelocity, pose.EastVellocity, pose.DownVelocity);
 
-    private (Matrix H, Vector Z, Matrix R) BuildHZRFromZupt(NaviPose pose)
+    private static (Matrix H, Vector Z, Matrix R) BuildHZRFromZupt(NaviPose pose)
     => (_H_v, BuildZ_v(pose), _R_v);
 }

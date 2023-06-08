@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:v="clr-namespace:LXIntegratedNavigation.WPF.Views"
     xmlns:vw="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
     Title="{Binding Title}"
     Width="800"
@@ -54,7 +53,7 @@
                                     To="50"
                                     Duration="0:0:0.3">
                                     <DoubleAnimation.EasingFunction>
-                                        <BackEase Amplitude="0.1" EasingMode="EaseOut" />
+                                        <BackEase Amplitude="0.1" EasingMode="EaseInOut" />
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
                             </Storyboard>
@@ -71,7 +70,7 @@
                                     To="200"
                                     Duration="0:0:0.3">
                                     <DoubleAnimation.EasingFunction>
-                                        <BackEase Amplitude="0.1" EasingMode="EaseOut" />
+                                        <BackEase Amplitude="0.1" EasingMode="EaseInOut" />
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
                             </Storyboard>
@@ -99,7 +98,10 @@
                                 <LayoutDocument Title="开始" Content="{x:Static local:Provider.StartPage}" />
                             </LayoutDocumentPane>
                         </LayoutDocumentPaneGroup>
-                        <LayoutAnchorablePaneGroup DockMinHeight="180" FloatingHeight="180">
+                        <LayoutAnchorablePaneGroup
+                            DockHeight="200"
+                            DockMinHeight="100"
+                            FloatingHeight="180">
                             <LayoutAnchorablePane>
                                 <LayoutAnchorable
                                     Title="输出"
@@ -116,9 +118,15 @@
                             </LayoutAnchorablePane>
                         </LayoutAnchorablePaneGroup>
                     </LayoutPanel>
-                    <LayoutAnchorablePaneGroup DockMinWidth="270" FloatingWidth="270">
-                        <LayoutAnchorablePane DockWidth="240" FloatingWidth="240">
-                            <LayoutAnchorable Title="属性" />
+                    <LayoutAnchorablePaneGroup
+                        DockMinWidth="100"
+                        DockWidth="200"
+                        FloatingWidth="270">
+                        <LayoutAnchorablePane DockWidth="240" FloatingWidth="20">
+                            <LayoutAnchorable
+                                Title="属性"
+                                CanAutoHide="True"
+                                CanClose="True" />
                         </LayoutAnchorablePane>
                     </LayoutAnchorablePaneGroup>
                 </LayoutPanel>

@@ -10,6 +10,8 @@ namespace LXIntegratedNavigation.WPF.Converters;
 
 public class VectorToStringConverter : BaseConverter<VectorToStringConverter>
 {
+    #region Public Methods
+
     public override object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is null)
@@ -26,4 +28,6 @@ public class VectorToStringConverter : BaseConverter<VectorToStringConverter>
         }
         return Vector.Parse(str);
     }
+
+    #endregion Public Methods
 }

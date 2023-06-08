@@ -54,21 +54,21 @@ public partial class LooseCombination
             if (isZeroVelocity)
             {
                 var HZR = BuildHZRFromZupt(curPose);
-                var (X_k, _) = Filter.Solve(I, Phi_kSub1Tok, HZR);
+                var (X_k, _) = Filter.Solve(Phi_kSub1Tok, HZR);
                 curPose = CorrectPose(X_k, curPose);
                 curImu = CorrectImuData(X_k, curImu);
                 Filter.X[0..9] = new(9);
                 Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
                 return (curPose, curImu);
             }
-            Filter.Solve(I, Phi_kSub1Tok);
+            Filter.Solve(Phi_kSub1Tok);
             Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
             return (curPose, curImu);
         }
         else
         {
             var HZR = BuildHZRFromGnss(curPose, curImu, curGnss);
-            var (X_k, _) = Filter.Solve(I, Phi_kSub1Tok, HZR);
+            var (X_k, _) = Filter.Solve(Phi_kSub1Tok, HZR);
             curPose = CorrectPose(X_k, curPose);
             curImu = CorrectImuData(X_k, curImu);
             Filter.X[0..9] = new(9);
@@ -76,8 +76,6 @@ public partial class LooseCombination
             return (curPose, curImu);
         }
     }
-
-
 
     public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas, GpsTime? initTime = null, IProgress<int>? progress = null)
     {
@@ -199,10 +197,10 @@ public partial class LooseCombination
             { F_rr, I, O, O, O, O, O},
             { F_vr, F_vv, C_b_nfx, O, C_b_n, O, C_b_n* diag_f },
             { F_phir, F_phiv,-omega_in_nx,-C_b_n, O,-C_b_n* diag_omega_ib_b, O },
-            { O, O, O,-I/ Options.RelevantTimeGyroBias, O, O, O },
-            { O, O, O, O,-I/ Options.RelevantTimeAccBias, O, O},
-            { O, O, O, O, O,-I/ Options.RelevantTimeGyroScale, O },
-            { O, O, O, O, O, O,-I/ Options.RelevantTimeAccScale }
+            { O, O, O,-I/ Options.CotGyroBias, O, O, O },
+            { O, O, O, O,-I/ Options.CotAccBias, O, O},
+            { O, O, O, O, O,-I/ Options.CotGyroScale, O },
+            { O, O, O, O, O, O,-I/ Options.CotAccScale }
         });
     }
 
@@ -277,10 +275,10 @@ public partial class LooseCombination
         {
             { Options.Vrw* Options.Vrw* I, O, O, O, O, O},
             { O, Options.Arw* Options.Arw* I, O, O, O, O },
-            { O, O,2* sigma2_gb* I/ Options.RelevantTimeGyroBias, O, O, O },
-            { O, O, O,2* sigma2_ab* I/ Options.RelevantTimeAccBias, O, O },
-            { O, O, O, O,2* sigma2_gs* I/ Options.RelevantTimeGyroScale, O },
-            { O, O, O, O, O,2* sigam2_as* I/ Options.RelevantTimeAccScale }
+            { O, O,2* sigma2_gb* I/ Options.CotGyroBias, O, O, O },
+            { O, O, O,2* sigma2_ab* I/ Options.CotAccBias, O, O },
+            { O, O, O, O,2* sigma2_gs* I/ Options.CotGyroScale, O },
+            { O, O, O, O, O,2* sigam2_as* I/ Options.CotAccScale }
         });
     }
 

@@ -39,45 +39,101 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         _dataService = dataService;
         _navigationService = navigationService;
     }
-#if DEBUG
-    string _imuFilePath = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\wide_Rover\\20230511_wide_imu.ASC";
-    string _gnssFilePath = "D:\\onedrive\\文档\\Tencent Files\\1597638582\\FileRecv\\wide.pos";
-    double _imuInterval = 0.01;
-    string _initTimeText = string.Empty;
-    string _initLocationText = "30.5278108404, 114.3557126448, 22.312";
-    string _initVelocityText = string.Empty;
-    string _initOrientationText = string.Empty;
-    double _staticDuration = 300;
-#endif
-#if RELEASE
-    string _imuFilePath = string.Empty;
-    string _gnssFilePath = string.Empty;
-    double _imuInterval = 0.01;
-    string _initTimeText = string.Empty;
-    string _initLocationText = string.Empty;
-    string _initVelocityText = string.Empty;
-    string _initOrientationText = string.Empty;
-    double _staticDuration = 0;
-#endif
-    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
-    public string ImuFilePath
-    {
-        get => _imuFilePath;
-        set => SetProperty(ref _imuFilePath, value, true);
-    }
-    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
-    public string GnssFilePath
-    {
-        get => _gnssFilePath;
-        set => SetProperty(ref _gnssFilePath, value, true);
-    }
 
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
+    string _imuFilePath = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\wide_Rover\\20230511_wide_imu.ASC";
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
+    string _gnssFilePath = "D:\\onedrive\\文档\\Tencent Files\\1597638582\\FileRecv\\wide.pos";
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
     [Range(0.0001, 1, ErrorMessage = "必须在0.0001到1范围内")]
-    public double ImuInterval
-    {
-        get => _imuInterval;
-        set => SetProperty(ref _imuInterval, value, true);
-    }
+    double _imuInterval = 0.01;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateGpsTime))]
+    string _initTimeText = string.Empty;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateLocation))]
+    string _initLocationText = "30.5278108404, 114.3557126448, 22.312";
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(AllowEmptyStrings = true)]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
+    string _initVelocityText = string.Empty;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateOrientation))]
+    string _initOrientationText = string.Empty;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _staticDuration = 300;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _arw = 0.2 * RadiansPerDegree / 60;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _vrw = 0.4 / 60;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _stdAccBias = 400E-5;
+
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _stdGyroBias = 24 * RadiansPerDegree / 3600;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _stdAccScale = 1000E-6;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _stdGyroScale = 1000E-6;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _cotAccBias = 3600;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _cotGyroBias = 3600;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _cotAccScale = 3600;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
+    double _cotGyroScale = 3600;
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
+    string _stdInitRText = "0.009, 0.008, -0.022";
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
+    string _stdInitVText = "0.000,0.000,-0.000";
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
+    string _stdInitPhiText = "0.05,0.05,0.05";
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
+    string _gnssLeverArmText = "0.2350,-0.1000,0.8900";
 
     public static ValidationResult ValidateFilePath(string imuFilePath)
     {
@@ -98,12 +154,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         }
     }
 
-    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateGpsTime))]
-    public string InitTimeText
-    {
-        get => _initTimeText;
-        set => SetProperty(ref _initTimeText, value, true);
-    }
+
     public static ValidationResult ValidateGpsTime(string str)
     {
         if (string.IsNullOrEmpty(str) || GpsTime.TryParse(str, null, out _))
@@ -119,21 +170,8 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         return new ValidationResult("格式有误");
     }
 
-    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateLocation))]
-    public string InitLocationText
-    {
-        get => _initLocationText;
-        set => SetProperty(ref _initLocationText, value, true);
-    }
 
-    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVelocity))]
-    public string InitVelocityText
-    {
-        get => _initVelocityText;
-        set => SetProperty(ref _initVelocityText, value, true);
-    }
-
-    public static ValidationResult ValidateVelocity(string str)
+    public static ValidationResult ValidateVector3d(string str)
     {
         if (string.IsNullOrEmpty(str))
             return ValidationResult.Success;
@@ -142,12 +180,6 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
             return ValidationResult.Success;
         }
         return new ValidationResult("格式有误");
-    }
-    [CustomValidation(typeof(StartPageViewModel), nameof(ValidateOrientation))]
-    public string InitOrientationText
-    {
-        get => _initOrientationText;
-        set => SetProperty(ref _initOrientationText, value, true);
     }
 
     public static ValidationResult ValidateOrientation(string str)
@@ -161,12 +193,6 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         return new ValidationResult("格式有误");
     }
 
-    [Range(0, double.MaxValue, ErrorMessage = $"必须>=0")]
-    public double StaticDuration
-    {
-        get => _staticDuration;
-        set => SetProperty(ref _staticDuration, value, true);
-    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsFromTextBox))]
@@ -229,7 +255,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         }
         if (_dataService.ImuDatas is null || _dataService.GnssDatas is null)
         {
-            MessageBox.Show("程序内部发生了一个错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            _snackbarService.Show("错误", "程序内部发生了错误", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
             return;
         }
         _snackbarService.Show("提示", "计算开始", SymbolRegular.Info28, ControlAppearance.Info);
@@ -244,6 +270,8 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
             initOrientation = _navigationService.Ins.StaticAlignment(initLocation, staticImuDatas);
             initTime += span;
         }
+        var imuErrorModel = new ImuErrorModel(Arw, Vrw, StdAccBias, StdAccScale, StdGyroBias, StdGyroScale, CotAccBias, CotAccScale, CotGyroBias, CotGyroScale);
+        var option = new LooseCombinationOptions(Vector.Parse(GnssLeverArmText), Vector.Parse(StdInitRText).Data, Vector.Parse(StdInitVText).Data, Vector.Parse(StdInitPhiText).Data, imuErrorModel);
         var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation);
         naviData = await _navigationService.LooseCombinationAsync(naviData, this);
         _snackbarService.Show("成功", "计算完成", SymbolRegular.CheckmarkCircle48, ControlAppearance.Success);

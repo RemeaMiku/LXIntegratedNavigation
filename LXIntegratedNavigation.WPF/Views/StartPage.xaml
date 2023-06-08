@@ -2,16 +2,17 @@
     x:Class="LXIntegratedNavigation.WPF.Views.StartPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:cv="clr-namespace:LXIntegratedNavigation.WPF.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
+    xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{x:Static local:Provider.StartPageViewModel}"
+    d:Height="2000"
+    d:Width="1000"
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="0" />
             <Setter Property="Padding" Value="0,10" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="FontFamily" Value="Microsoft Yahei UI Light" />
@@ -29,9 +30,6 @@
             <Setter Property="Filled" Value="True" />
             <Setter Property="Foreground" Value="{StaticResource MikuGreenBrushAA}" />
             <Setter Property="FontSize" Value="40" />
-        </Style>
-        <Style BasedOn="{StaticResource {x:Type ui:TextBox}}" TargetType="ui:TextBox">
-            <Setter Property="Margin" Value="0,0,0,15" />
         </Style>
         <ControlTemplate x:Key="ErrorInfoTemplate">
             <StackPanel>
@@ -55,7 +53,7 @@
         </Grid.RowDefinitions>
         <Image
             Grid.RowSpan="2"
-            Opacity="0.831"
+            Opacity="0.39"
             Source="../Images/background.png"
             Stretch="UniformToFill" />
         <ui:DynamicScrollViewer>
@@ -68,11 +66,23 @@
                         </StackPanel>
                     </ui:CardExpander.Header>
                     <StackPanel>
-                        <TextBlock Text="IMU采样间隔(s)" />
-                        <ui:TextBox
-                            PlaceholderText="填写IMU采样间隔。单位为秒"
-                            Text="{Binding ImuInterval}"
-                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                        <TextBlock Text="IMU采样间隔" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                PlaceholderText="填写IMU采样间隔。单位为秒"
+                                Text="{Binding ImuInterval}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula="s" />
+                        </Grid>
+
                         <TextBlock Text="IMU文件路径" />
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
@@ -116,47 +126,287 @@
                 <ui:CardExpander>
                     <ui:CardExpander.Header>
                         <StackPanel Orientation="Horizontal">
-                            <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="FastAcceleration24" />
-                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="参数设定" />
+                            <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="NetworkCheck24" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="IMU参数设定" />
                         </StackPanel>
                     </ui:CardExpander.Header>
                     <StackPanel>
-                        <TextBlock Text="IMU初始误差" />
+                        <TextBlock Text="角度随机游走(ARW)" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Text="{Binding Arw}" Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" {}^\circ / \sqrt{h}" />
+                        </Grid>
+                        <TextBlock Text="速度随机游走(VRW)" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Text="{Binding Vrw}" />
+                            <math:FormulaControl
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" m/s / \sqrt{h}" />
+                        </Grid>
+                        <TextBlock Text="加速度计零偏" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Margin="0,0,10,0"
+                                FontSize="14"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="1"
+                                Text="{Binding StdAccBias}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" mGal " />
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="20,0,10,0"
+                                FontSize="14"
+                                Text="相关时间" />
+                            <ui:TextBox
+                                Grid.Column="4"
+                                Text="{Binding CotAccBias}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="5"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" h " />
+                        </Grid>
+                        <TextBlock Text="陀螺仪零偏" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Margin="0,0,10,0"
+                                FontSize="14"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="1"
+                                Text="{Binding StdGyroBias}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" m/s / \sqrt{h}" />
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="20,0,10,0"
+                                FontSize="14"
+                                Text="相关时间" />
+                            <ui:TextBox
+                                Grid.Column="4"
+                                Text="{Binding CotGyroBias}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="5"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" h " />
+                        </Grid>
+                        <TextBlock Text="加速度计比例因子" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Margin="0,0,10,0"
+                                FontSize="14"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="1"
+                                Text="{Binding StdAccScale}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" ppm " />
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="20,0,10,0"
+                                FontSize="14"
+                                Text="相关时间" />
+                            <ui:TextBox
+                                Grid.Column="4"
+                                Text="{Binding CotAccScale}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="5"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" h " />
+                        </Grid>
+                        <TextBlock Text="陀螺仪比例因子" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Margin="0,0,10,0"
+                                FontSize="14"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="1"
+                                Text="{Binding StdGyroScale}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" ppm " />
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="20,0,10,0"
+                                FontSize="14"
+                                Text="相关时间" />
+                            <ui:TextBox
+                                Grid.Column="4"
+                                Text="{Binding CotGyroScale}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="5"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" h " />
+                        </Grid>
+                    </StackPanel>
+                </ui:CardExpander>
+                <ui:CardExpander>
+                    <ui:CardExpander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="Earth24" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="GNSS参数设定" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock Text="杆臂" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Text="{Binding GnssLeverArmText}" Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula="m" />
+                        </Grid>
+
                     </StackPanel>
                 </ui:CardExpander>
                 <ui:CardExpander>
                     <ui:CardExpander.Header>
                         <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Style="{StaticResource SymbolHeaderStyle}" Symbol="PlaySettings20" />
-                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="解算设定" />
+                            <TextBlock Style="{StaticResource TextBlockHeaderStyle}" Text="初始项设定" />
                         </StackPanel>
                     </ui:CardExpander.Header>
                     <StackPanel>
                         <TextBlock Text="初始时刻(GPS周,GPS秒)" />
+
+                        <ui:TextBox
+                            PlaceholderText="填写开始时刻。不填将从第一个开始解算"
+                            Text="{Binding InitTimeText}"
+                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+
+                        <TextBlock Text="初始位置(纬度,经度,大地高)" />
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ui:TextBox
-                                PlaceholderText="填写开始时刻。不填将从第一个开始解算"
-                                Text="{Binding InitTimeText}"
+                                PlaceholderText="填写大地坐标。格式：纬度(°),经度(°),大地高"
+                                Text="{Binding InitLocationText}"
                                 Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="20,0,0,0"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                Text="{Binding StdInitRText}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="3"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula="m" />
                         </Grid>
-                        <TextBlock Text="初始位置(纬度,经度,大地高)" />
-
-                        <ui:TextBox
-                            PlaceholderText="填写大地坐标。格式：纬度(°),经度(°),大地高"
-                            Text="{Binding InitLocationText}"
-                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
 
 
                         <TextBlock Text="初始速度(北向,东向,地向)" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                PlaceholderText="填写初始速度。格式为：北向速度,东向速度,地向速度。不填为零速"
+                                Text="{Binding InitVelocityText}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="20,0,0,0"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                Text="{Binding StdInitVText}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="3"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula="m/s" />
+                        </Grid>
 
-                        <ui:TextBox
-                            PlaceholderText="填写初始速度。格式为：北向速度,东向速度,地向速度。不填为零速"
-                            Text="{Binding InitVelocityText}"
-                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -171,22 +421,54 @@
                                 Content="使用静态粗对准获取"
                                 IsChecked="{Binding IsFromStaticAlignment}" />
                         </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                Name="InitOrientationTextBox"
+                                IsEnabled="{Binding IsFromTextBox}"
+                                PlaceholderText="填写初始方向。格式为：航向(°),俯仰(°),横滚(°)。不填为均为0°"
+                                Text="{Binding InitOrientationText}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="20,0,0,0"
+                                Text="标准差" />
+                            <ui:TextBox
+                                Grid.Column="2"
+                                Margin="10,0,0,0"
+                                Text="{Binding StdInitPhiText}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="3"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula=" {}^\circ " />
+                        </Grid>
 
-                        <ui:TextBox
-                            Name="InitOrientationTextBox"
-                            IsEnabled="{Binding IsFromTextBox}"
-                            PlaceholderText="填写初始方向。格式为：航向(°),俯仰(°),横滚(°)。不填为均为0°"
-                            Text="{Binding InitOrientationText}"
-                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
-                        <TextBlock Text="静态粗对准时长(s)" />
-                        <ui:TextBox
-                            IsEnabled="{Binding IsFromStaticAlignment}"
-                            PlaceholderText="填写对准时长"
-                            Text="{Binding StaticDuration}"
-                            Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                        <TextBlock Text="静态粗对准时长" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                IsEnabled="{Binding IsFromStaticAlignment}"
+                                PlaceholderText="填写对准时长"
+                                Text="{Binding StaticDuration}"
+                                Validation.ErrorTemplate="{StaticResource ErrorInfoTemplate}" />
+                            <math:FormulaControl
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                Formula="s" />
+                        </Grid>
                     </StackPanel>
                 </ui:CardExpander>
-
             </StackPanel>
         </ui:DynamicScrollViewer>
         <ui:Card
@@ -217,5 +499,4 @@
             FontSize="20"
             Timeout="3900" />
     </Grid>
-
 </UserControl>

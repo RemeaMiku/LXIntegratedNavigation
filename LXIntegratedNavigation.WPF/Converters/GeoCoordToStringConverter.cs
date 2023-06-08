@@ -11,6 +11,8 @@ namespace LXIntegratedNavigation.WPF.Converters;
 
 public class GeoCoordToStringConverter : BaseConverter<GeoCoordToStringConverter>
 {
+    #region Public Methods
+
     public override object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is null)
@@ -27,4 +29,6 @@ public class GeoCoordToStringConverter : BaseConverter<GeoCoordToStringConverter
         }
         return GeodeticCoord.Parse(str);
     }
+
+    #endregion Public Methods
 }

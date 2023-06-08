@@ -11,6 +11,17 @@ namespace LXIntegratedNavigation.WPF;
 
 public static class Provider
 {
+    #region Public Constructors
+
+    static Provider()
+    {
+        DialogService.SetDialogControl(new Dialog());
+    }
+
+    #endregion Public Constructors
+
+    #region Public Properties
+
     public static SnackbarService SnackbarService { get; set; } = new();
 
     public static DataService DataService { get; } = new();
@@ -22,8 +33,5 @@ public static class Provider
 
     public static DialogService DialogService { get; } = new();
 
-    static Provider()
-    {
-        DialogService.SetDialogControl(new Dialog());
-    }
+    #endregion Public Properties
 }

@@ -9,6 +9,8 @@ namespace LXIntegratedNavigation.WPF.Converters;
 
 public class UtcTimeToStringConverter : BaseConverter<UtcTimeToStringConverter>
 {
+    #region Public Methods
+
     public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return ((UtcTime)value).ToString("yyyy.MM.dd HH:mm:ss.ffffff");
@@ -18,4 +20,6 @@ public class UtcTimeToStringConverter : BaseConverter<UtcTimeToStringConverter>
     {
         return UtcTime.Parse((string)value);
     }
+
+    #endregion Public Methods
 }

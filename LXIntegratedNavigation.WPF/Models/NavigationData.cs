@@ -11,6 +11,21 @@ namespace LXIntegratedNavigation.WPF.Models;
 
 public class NavigationData
 {
+    #region Public Constructors
+
+    public NavigationData(GpsTime initTime, NaviPose initPose, LooseCombinationOptions options, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
+    {
+        InitTime = initTime;
+        InitPose = initPose;
+        Options = options;
+        ImuDatas = new(imuDatas);
+        GnssDatas = new(gnssDatas);
+    }
+
+    #endregion Public Constructors
+
+    #region Public Properties
+
     public GpsTime InitTime { get; init; }
     public NaviPose InitPose { get; init; }
 
@@ -21,12 +36,5 @@ public class NavigationData
 
     public List<NaviPose>? NaviPoses { get; set; }
 
-    public NavigationData(GpsTime initTime, NaviPose initPose, LooseCombinationOptions options, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas)
-    {
-        InitTime = initTime;
-        InitPose = initPose;
-        Options = options;
-        ImuDatas = new(imuDatas);
-        GnssDatas = new(gnssDatas);
-    }
+    #endregion Public Properties
 }

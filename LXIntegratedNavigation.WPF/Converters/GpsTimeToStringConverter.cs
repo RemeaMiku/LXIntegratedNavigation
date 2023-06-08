@@ -12,6 +12,8 @@ namespace LXIntegratedNavigation.WPF.Converters;
 public class GpsTimeToStringConverter : BaseConverter<GpsTimeToStringConverter>
 {
 
+    #region Public Methods
+
     public override object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is null)
@@ -30,4 +32,6 @@ public class GpsTimeToStringConverter : BaseConverter<GpsTimeToStringConverter>
         }
         return GpsTime.Parse(str);
     }
+
+    #endregion Public Methods
 }

@@ -11,7 +11,16 @@ namespace LXIntegratedNavigation.WPF.Converters;
 
 public abstract class BaseConverter<T> : IValueConverter where T : class, new()
 {
+    #region Public Properties
+
     public static T Instance { get; } = new();
+
+    #endregion Public Properties
+
+    #region Public Methods
+
     public abstract object Convert(object value, Type targetType, object parameter, CultureInfo culture);
     public abstract object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture);
+
+    #endregion Public Methods
 }

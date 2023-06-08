@@ -22,6 +22,7 @@
 		<PackageReference Include="AakStudio.Shell.UI.Themes.AvalonDock" Version="4.72.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
 		<PackageReference Include="WPF-UI" Version="2.0.3" />
+		<PackageReference Include="WpfMath" Version="1.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>

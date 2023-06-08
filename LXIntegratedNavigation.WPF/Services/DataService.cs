@@ -14,8 +14,14 @@ namespace LXIntegratedNavigation.WPF.Services;
 public class DataService
 {
 
+    #region Public Properties
+
     public IEnumerable<ImuData>? ImuDatas { get; private set; }
     public IEnumerable<GnssData>? GnssDatas { get; private set; }
+
+    #endregion Public Properties
+
+    #region Public Methods
 
     public async Task<bool> InitializeImuDatasAsync(string imuFilePath, TimeSpan interval)
     {
@@ -49,28 +55,31 @@ public class DataService
             throw new InvalidOperationException();
         options ??= new LooseCombinationOptions
                 (
-                    StdInitR_n: 0.009,
-                    StdInitR_e: 0.008,
-                    StdInitR_d: 0.022,
-                    StdInitV_n: 0,
-                    StdInitV_e: 0,
-                    StdInitV_d: 0,
-                    StdInitPhi_n: FromDegrees(0),
-                    StdInitPhi_e: FromDegrees(0),
-                    StdInitPhi_d: FromDegrees(0),
-                    GnssLeverArm: new(0.235, 0.1, 0.89),
-                    Arw: 0.2 * RadiansPerDegree / 60,
-                    Vrw: 0.4 / 60,
-                    StdAccBias: 400E-5,
-                    StdAccScale: 1000E-6,
-                    StdGyroBias: 24 * RadiansPerDegree / 3600,
-                    StdGyroScale: 1000E-6,
-                    RelevantTimeAccBias: 3600,
-                    RelevantTimeAccScale: 3600,
-                    RelevantTimeGyroBias: 3600,
-                    RelevantTimeGyroScale: 3600
+                    stdInitR_n: 0.009,
+                    stdInitR_e: 0.008,
+                    stdInitR_d: 0.022,
+                    stdInitV_n: 0,
+                    stdInitV_e: 0,
+                    stdInitV_d: 0,
+                    stdInitPhi_n: FromDegrees(0),
+                    stdInitPhi_e: FromDegrees(0),
+                    stdInitPhi_d: FromDegrees(0),
+                    gnssLeverArm: new(0.235, 0.1, 0.89),
+                    imuErrorModel: new(
+                        arw: 0.2 * RadiansPerDegree / 60,
+                        vrw: 0.4 / 60,
+                        stdAccBias: 400E-5,
+                        stdAccScale: 1000E-6,
+                        stdGyroBias: 24 * RadiansPerDegree / 3600,
+                        stdGyroScale: 1000E-6,
+                        cotAccBias: 3600,
+                        cotAccScale: 3600,
+                        cotGyroBias: 3600,
+                        cotGyroScale: 3600)
                 );
         return new(initTime, new(initTime, initLocation, initVelocity, initOrientation), options, ImuDatas, GnssDatas);
     }
+
+    #endregion Public Methods
 
 }
