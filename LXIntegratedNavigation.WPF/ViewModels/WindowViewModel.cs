@@ -7,6 +7,9 @@ namespace LXIntegratedNavigation.WPF.ViewModels;
 
 internal partial class WindowViewModel : ObservableObject
 {
+    [ObservableProperty]
+    WindowState _windowState = WindowState.Maximized;
+
     public WindowViewModel(Window window)
     {
         _window = window;
@@ -41,7 +44,10 @@ internal partial class WindowViewModel : ObservableObject
     public CornerRadius WindowCornerRadius => new(WindowRadius);
     public Thickness InnerContentPadding => new(ResizeBorder);
     [RelayCommand]
-    void Minimize() => _window.WindowState = WindowState.Minimized;
+    void Minimize()
+    {
+        _window.WindowState = WindowState.Minimized;
+    }
     [RelayCommand]
     void Maximize()
     {

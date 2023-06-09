@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:v="clr-namespace:LXIntegratedNavigation.WPF.Views"
     xmlns:vw="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
     Title="{Binding Title}"
     Width="800"
@@ -16,7 +17,7 @@
     AllowsTransparency="True"
     Template="{DynamicResource MainWindowTemplate}"
     WindowStartupLocation="CenterScreen"
-    WindowState="Maximized"
+    WindowState="{Binding WindowState}"
     WindowStyle="None"
     mc:Ignorable="d">
     <WindowChrome.WindowChrome>
@@ -95,7 +96,7 @@
                     <LayoutPanel Orientation="Vertical">
                         <LayoutDocumentPaneGroup>
                             <LayoutDocumentPane x:Name="DocumentPane">
-                                <LayoutDocument Title="开始" Content="{x:Static local:Provider.StartPage}" />
+                                <LayoutDocument Title="开始" Content="{x:Static v:StartPage.Instance}" />
                             </LayoutDocumentPane>
                         </LayoutDocumentPaneGroup>
                         <LayoutAnchorablePaneGroup
@@ -106,9 +107,8 @@
                                 <LayoutAnchorable
                                     Title="输出"
                                     CanAutoHide="False"
-                                    CanClose="True">
-                                    <TextBlock Padding="5" Text="输出" />
-                                </LayoutAnchorable>
+                                    CanClose="True"
+                                    Content="{x:Static v:LogPage.Instance}" />
                                 <LayoutAnchorable
                                     Title="统计"
                                     CanAutoHide="False"

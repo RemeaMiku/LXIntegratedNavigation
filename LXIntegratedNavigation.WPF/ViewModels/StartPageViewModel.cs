@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -33,19 +34,23 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     readonly NavigationService _navigationService;
     readonly DataService _dataService;
     readonly ISnackbarService _snackbarService;
-    public StartPageViewModel(ISnackbarService snackbarService, DataService dataService, NavigationService navigationService)
+    readonly LogService _logService;
+    public StartPageViewModel(ISnackbarService snackbarService, LogService logService, DataService dataService, NavigationService navigationService)
     {
         _snackbarService = snackbarService;
+        _logService = logService;
         _dataService = dataService;
         _navigationService = navigationService;
     }
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
     string _imuFilePath = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\wide_Rover\\20230511_wide_imu.ASC";
     [ObservableProperty]
     [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateFilePath))]
     string _gnssFilePath = "D:\\onedrive\\文档\\Tencent Files\\1597638582\\FileRecv\\wide.pos";
     [ObservableProperty]
@@ -58,6 +63,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     string _initTimeText = string.Empty;
     [ObservableProperty]
     [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateLocation))]
     string _initLocationText = "30.5278108404, 114.3557126448, 22.312";
     [ObservableProperty]
@@ -116,17 +122,17 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     double _cotGyroScale = 3600;
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
     string _stdInitRText = "0.009, 0.008, -0.022";
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
     string _stdInitVText = "0.000,0.000,-0.000";
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
+    [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
     string _stdInitPhiText = "0.05,0.05,0.05";
     [ObservableProperty]
@@ -135,13 +141,11 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
     string _gnssLeverArmText = "0.2350,-0.1000,0.8900";
 
-    public static ValidationResult ValidateFilePath(string imuFilePath)
+    public static ValidationResult ValidateFilePath(string filePath)
     {
-        if (string.IsNullOrEmpty(imuFilePath))
-            return new ValidationResult("不能为空");
         try
         {
-            var isvalid = new FileInfo(imuFilePath).Exists;
+            var isvalid = new FileInfo(filePath).Exists;
             if (isvalid)
             {
                 return ValidationResult.Success;
@@ -163,8 +167,6 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     }
     public static ValidationResult ValidateLocation(string str)
     {
-        if (string.IsNullOrEmpty(str))
-            return new ValidationResult("不能为空");
         if (GeodeticCoord.TryParse(str, null, out _))
             return ValidationResult.Success;
         return new ValidationResult("格式有误");
@@ -237,28 +239,36 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [RelayCommand]
     async Task StartAsync()
     {
+        _logService.Send(LogType.Info, "开始核验表单");
         ValidateAllProperties();
         if (HasErrors)
         {
             _snackbarService.Show("错误", "填写存在错误", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _logService.Send(LogType.Error, "表单填写存在错误，解算已取消");
             return;
         }
+        _logService.Send(LogType.Info, $"开始读取IMU文件: {Path.GetFileName(ImuFilePath)}");
         if (!await _dataService.InitializeImuDatasAsync(ImuFilePath, TimeSpan.FromSeconds(ImuInterval)))
         {
             _snackbarService.Show("错误", "IMU文件读取出错", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _logService.Send(LogType.Error, $"读取 {Path.GetFileName(ImuFilePath)} 时出错，解算已取消");
             return;
         }
+        _logService.Send(LogType.Info, $"开始读取GNSS文件: {Path.GetFileName(GnssFilePath)}");
         if (!await _dataService.InitializeGnssDatasAsync(GnssFilePath))
         {
             _snackbarService.Show("错误", "GNSS文件读取出错", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _logService.Send(LogType.Error, $"读取 {Path.GetFileName(GnssFilePath)} 时出错，解算已取消");
             return;
         }
         if (_dataService.ImuDatas is null || _dataService.GnssDatas is null)
         {
-            _snackbarService.Show("错误", "程序内部发生了错误", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _snackbarService.Show("错误", "未知原因", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _logService.Send(LogType.Error, "发生了一个未知错误，解算已取消");
             return;
         }
-        _snackbarService.Show("提示", "计算开始", SymbolRegular.Info28, ControlAppearance.Info);
+        _snackbarService.Show("提示", "解算开始", SymbolRegular.Info28, ControlAppearance.Info);
+        _logService.Send(LogType.Info, "开始解算");
         var initTime = string.IsNullOrEmpty(InitTimeText) ? _dataService.ImuDatas.First().TimeStamp : GpsTime.Parse(InitTimeText);
         var initLocation = GeodeticCoord.Parse(InitLocationText);
         var initVelocity = string.IsNullOrEmpty(InitVelocityText) ? new(3) : Vector.Parse(InitVelocityText);
@@ -275,11 +285,9 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation);
         naviData = await _navigationService.LooseCombinationAsync(naviData, this);
         _snackbarService.Show("成功", "计算完成", SymbolRegular.CheckmarkCircle48, ControlAppearance.Success);
+        _logService.Send(LogType.Info, "解算完毕");
     }
     [ObservableProperty]
     double _progress = 0;
-    public void Report(int value)
-    {
-        Progress = value;
-    }
+    public void Report(int value) => Progress = value;
 }

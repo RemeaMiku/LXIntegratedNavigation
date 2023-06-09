@@ -24,10 +24,10 @@ public class NavigationService
             var lc = new LooseCombination(Ins, data.Options);
             return lc.Solve(data.InitPose, data.ImuDatas, data.GnssDatas, data.InitTime, progress).ToList();
         });
-#if DEBUG
+
         // Write the poses on the UI thread
-        WritePoses(GetPathAtDesktop($"InsResult_{DateTime.Now:yyMMddHHmmss}.csv"), data.NaviPoses);
-#endif
+        //WritePoses(GetPathAtDesktop($"InsResult_{DateTime.Now:yyMMddHHmmss}.csv"), data.NaviPoses);
+
         // Return the data
         return data;
     }

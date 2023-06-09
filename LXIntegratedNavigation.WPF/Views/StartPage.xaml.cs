@@ -12,7 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Mvvm.Contracts;
+using Wpf.Ui.Mvvm.Services;
 
 namespace LXIntegratedNavigation.WPF.Views
 {
@@ -22,16 +25,15 @@ namespace LXIntegratedNavigation.WPF.Views
     public partial class StartPage : UserControl
     {
         #region Public Constructors
-
+        public static StartPage Instance => Current.Services.GetService<StartPage>() ?? throw new NullReferenceException();
         public StartPageViewModel ViewModel { get; }
 
-        public StartPage()
+        public StartPage(ISnackbarService snackbarService, StartPageViewModel viewModel)
         {
-
-            DataContext = Provider.StartPageViewModel;
-            ViewModel = Provider.StartPageViewModel;
+            DataContext = viewModel;
+            ViewModel = viewModel;
             InitializeComponent();
-            SnackbarService.SetSnackbarControl(Snackbar);
+            snackbarService.SetSnackbarControl(Snackbar);
         }
 
         #endregion Public Constructors

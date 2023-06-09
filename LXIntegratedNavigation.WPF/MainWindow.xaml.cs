@@ -9,7 +9,7 @@ namespace LXIntegratedNavigation.WPF;
 /// </summary>
 public partial class MainWindow : Window
 {
-    #region Public Constructors
+    #region Public Constructors    
 
     public MainWindow()
     {

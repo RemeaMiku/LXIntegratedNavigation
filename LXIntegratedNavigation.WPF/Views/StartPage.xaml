@@ -7,7 +7,6 @@
     xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    d:DataContext="{x:Static local:Provider.StartPageViewModel}"
     d:Height="2000"
     d:Width="1000"
     mc:Ignorable="d">
