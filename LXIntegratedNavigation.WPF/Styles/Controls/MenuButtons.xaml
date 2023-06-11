@@ -1,5 +1,7 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <Style x:Key="MenuRadioButtonStyle" TargetType="{x:Type RadioButton}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="Black" />
@@ -7,6 +9,7 @@
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Height" Value="50" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
@@ -38,7 +41,7 @@
                                 RadiusY="2" />
 
                             <!--  Icon  -->
-                            <Path
+                            <!--<Path
                                 x:Name="Icon"
                                 Width="24"
                                 Height="24"
@@ -47,7 +50,15 @@
                                 VerticalAlignment="Center"
                                 Data="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}}"
                                 Fill="#EEEEEE"
-                                Stretch="None" />
+                                Stretch="None" />-->
+
+                            <ui:SymbolIcon
+                                x:Name="Icon"
+                                Margin="0,0,5,0"
+                                FontSize="24"
+                                Foreground="LightGray"
+                                Symbol="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}}" />
+
 
                             <!--  Text  -->
                             <TextBlock
@@ -65,12 +76,12 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="txtName" Property="Foreground" Value="#39c5bb" />
-                            <Setter TargetName="Icon" Property="Fill" Value="#39c5bb" />
+                            <Setter TargetName="Icon" Property="Foreground" Value="#39c5bb" />
                             <Setter TargetName="Indicator" Property="Fill" Value="#39c5bb" />
                             <Setter TargetName="Indicator" Property="Height" Value="50" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Icon" Property="Fill" Value="#39c5bb" />
+                            <Setter TargetName="Icon" Property="Foreground" Value="#39c5bb" />
                             <Setter TargetName="Indicator" Property="Fill" Value="#39c5bb" />
                             <Setter TargetName="Indicator" Property="Height" Value="50" />
                             <Setter TargetName="btnSelected" Property="Background" Value="#3339c5bb" />
@@ -88,7 +99,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border
+                    <ui:SymbolIcon
+                        x:Name="Icon"
+                        FontSize="24"
+                        Foreground="LightGray"
+                        Symbol="Navigation24" />
+                    <!--<Border
                         x:Name="border"
                         Background="{TemplateBinding Background}"
                         BorderThickness="{TemplateBinding BorderThickness}"
@@ -116,18 +132,13 @@
                                     Fill="#EEEEEE" />
                             </Canvas>
                         </Viewbox>
-                    </Border>
+                    </Border>-->
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="Transparent" />
-                            <Setter TargetName="border" Property="BorderBrush" Value="#FFFFFF" />
-                            <Setter TargetName="ico" Property="Fill" Value="#39c5bb" />
-                            <Setter TargetName="ico1" Property="Fill" Value="#39c5bb" />
-                            <Setter TargetName="ico2" Property="Fill" Value="#39c5bb" />
+                            <Setter TargetName="Icon" Property="Foreground" Value="#39c5bb" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="Transparent" />
-                            <Setter TargetName="border" Property="BorderBrush" Value="#FFFFFF" />
+                            <Setter TargetName="Icon" Property="Foreground" Value="#39c5bb" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

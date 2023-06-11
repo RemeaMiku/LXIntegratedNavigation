@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 
 namespace LXIntegratedNavigation.WPF.Views;
 
@@ -31,30 +33,4 @@ public partial class LogPage : UserControl
         ViewModel = viewModel;
     }
 
-    private bool _autoScroll = true;
-
-    private void ScrollViewer_ScrollChanged(Object sender, ScrollChangedEventArgs e)
-    {
-        // User scroll event : set or unset auto-scroll mode
-        if (e.ExtentHeightChange == 0)
-        {   // Content unchanged : user scroll event
-            if (ScrollViewer.VerticalOffset == ScrollViewer.ScrollableHeight)
-            {   // Scroll bar is in bottom
-                // Set auto-scroll mode
-                _autoScroll = true;
-            }
-            else
-            {   // Scroll bar isn't in bottom
-                // Unset auto-scroll mode
-                _autoScroll = false;
-            }
-        }
-
-        // Content scroll event : auto-scroll eventually
-        if (_autoScroll && e.ExtentHeightChange != 0)
-        {   // Content changed and auto-scroll mode set
-            // Autoscroll
-            ScrollViewer.ScrollToVerticalOffset(ScrollViewer.ExtentHeight);
-        }
-    }
 }

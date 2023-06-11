@@ -6,6 +6,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:v="clr-namespace:LXIntegratedNavigation.WPF.Views"
     xmlns:vw="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
     Title="{Binding Title}"
@@ -14,19 +17,17 @@
     MinWidth="{Binding WindowMinWidth}"
     MinHeight="{Binding WindowMaxHeight}"
     d:DataContext="{d:DesignInstance Type=vw:MainWindowViewModel}"
-    AllowsTransparency="True"
-    Template="{DynamicResource MainWindowTemplate}"
+    syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"
     WindowStartupLocation="CenterScreen"
     WindowState="{Binding WindowState}"
-    WindowStyle="None"
     mc:Ignorable="d">
-    <WindowChrome.WindowChrome>
+    <!--<WindowChrome.WindowChrome>
         <WindowChrome
             CaptionHeight="{Binding CaptionHeight}"
             CornerRadius="0"
             GlassFrameThickness="0"
             ResizeBorderThickness="{Binding ResizeBorderThickness}" />
-    </WindowChrome.WindowChrome>
+    </WindowChrome.WindowChrome>-->
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -82,12 +83,42 @@
             <RadioButton
                 Content="开始"
                 IsChecked="True"
-                Style="{StaticResource MenuRadioButtonStyle}" />
-            <RadioButton Content="INS" Style="{StaticResource MenuRadioButtonStyle}" />
-            <RadioButton Content="GNSS" Style="{StaticResource MenuRadioButtonStyle}" />
-            <RadioButton Content="LC" Style="{StaticResource MenuRadioButtonStyle}" />
+                Style="{StaticResource MenuRadioButtonStyle}"
+                Tag="{x:Static ui:SymbolRegular.Play28}" />
+            <RadioButton
+                Content="轨迹"
+                Style="{StaticResource MenuRadioButtonStyle}"
+                Tag="{x:Static ui:SymbolRegular.ArrowRouting24}" />
+            <RadioButton
+                Content="统计"
+                Style="{StaticResource MenuRadioButtonStyle}"
+                Tag="{x:Static ui:SymbolRegular.ChartMultiple24}" />
+            <RadioButton
+                Content="导出"
+                Style="{StaticResource MenuRadioButtonStyle}"
+                Tag="{x:Static ui:SymbolRegular.Share24}" />
         </StackPanel>
-        <DockingManager Grid.Column="1" Background="White">
+        <!--  Dock Window Area  -->
+        <ui:Snackbar
+            Name="Snackbar"
+            Grid.Column="1"
+            Width="390"
+            HorizontalAlignment="Right"
+            Panel.ZIndex="1000"
+            FontFamily="Microsoft Yahei UI Light"
+            FontSize="20"
+            Timeout="3900" />
+        <syncfusion:DockingManager
+            x:Name="DockingManager"
+            Grid.Column="1"
+            Background="White"
+            EnableMouseHoverBackground="True"
+            IsVS2010DraggingEnabled="True"
+            ItemsSource="{Binding DockItems}"
+            MaximizeButtonEnabled="True"
+            MinimizeButtonEnabled="True"
+            UseDocumentContainer="True" />
+        <!--<DockingManager Grid.Column="1" Background="White">
             <DockingManager.Theme>
                 <aakthemes:VisualStudio2022Light />
             </DockingManager.Theme>
@@ -131,6 +162,6 @@
                     </LayoutAnchorablePaneGroup>
                 </LayoutPanel>
             </LayoutRoot>
-        </DockingManager>
+        </DockingManager>-->
     </Grid>
 </Window>

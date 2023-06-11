@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using LXIntegratedNavigation.Shared.Essentials.Navigation;
@@ -35,6 +36,20 @@ public class NavigationData
     public List<GnssData> GnssDatas { get; init; }
 
     public List<NaviPose>? NaviPoses { get; set; }
+
+    public IEnumerable<(double X, double Y)> GetTrajectoryData()
+    {
+        if (NaviPoses is null)
+            throw new InvalidOperationException();
+        var initPose = NaviPoses[0];
+        for (var i = 1; i < NaviPoses.Count; i++)
+        {
+            var x = (NaviPoses[i].L - initPose.L) * 6371000;
+            var y = (NaviPoses[i].B - initPose.B) * 6371000;
+            yield return new(x, y);
+        }
+    }
+
 
     #endregion Public Properties
 }

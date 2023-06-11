@@ -28,12 +28,11 @@ namespace LXIntegratedNavigation.WPF.Views
         public static StartPage Instance => Current.Services.GetService<StartPage>() ?? throw new NullReferenceException();
         public StartPageViewModel ViewModel { get; }
 
-        public StartPage(ISnackbarService snackbarService, StartPageViewModel viewModel)
+        public StartPage(StartPageViewModel viewModel)
         {
             DataContext = viewModel;
             ViewModel = viewModel;
             InitializeComponent();
-            snackbarService.SetSnackbarControl(Snackbar);
         }
 
         #endregion Public Constructors

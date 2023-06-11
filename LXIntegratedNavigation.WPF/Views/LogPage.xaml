@@ -11,20 +11,22 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <ScrollViewer x:Name="ScrollViewer" ScrollChanged="ScrollViewer_ScrollChanged">
-        <ListView ItemsSource="{Binding ViewModel.Logs}">
-            <ListView.ItemTemplate>
-                <DataTemplate DataType="vw:LogViewModel">
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon
-                            Margin="10,0"
-                            Foreground="{Binding Foreground}"
-                            Symbol="{Binding Symbol}" />
-                        <TextBlock Margin="10,0" Text="{Binding Time}" />
-                        <TextBlock Margin="10,0" Text="{Binding Message}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-    </ScrollViewer>
+
+    <ListBox
+        x:Name="LogView"
+        local:ListBoxBehavior.ScrollOnNewItem="true"
+        ItemsSource="{Binding ViewModel.Logs}">
+        <ListBox.ItemTemplate>
+            <DataTemplate DataType="vw:LogViewModel">
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon
+                        Margin="10,0"
+                        Foreground="{Binding Foreground}"
+                        Symbol="{Binding Symbol}" />
+                    <TextBlock Margin="10,0" Text="{Binding Time}" />
+                    <TextBlock Margin="10,0" Text="{Binding Message}" />
+                </StackPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
 </UserControl>

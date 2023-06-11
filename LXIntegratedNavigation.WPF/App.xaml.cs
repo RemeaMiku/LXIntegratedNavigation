@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media;
 using LXIntegratedNavigation.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Syncfusion.SfSkinManager;
+using Syncfusion.Themes.FluentLight.WPF;
+using Syncfusion.Themes.Windows11Light.WPF;
 using Wpf.Ui.Mvvm.Contracts;
 using Wpf.Ui.Mvvm.Services;
 

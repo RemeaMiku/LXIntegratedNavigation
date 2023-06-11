@@ -7,6 +7,8 @@
     xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewmodels="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:StartPageViewModel}"
     d:Height="2000"
     d:Width="1000"
     mc:Ignorable="d">
@@ -479,7 +481,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ProgressBar Value="{Binding Progress}" />
+                <ProgressBar Height="16" Value="{Binding Progress}" />
                 <ui:Button
                     Grid.Column="1"
                     Margin="20,0,0,0"
@@ -491,11 +493,6 @@
                     IconFilled="True" />
             </Grid>
         </ui:Card>
-        <ui:Snackbar
-            Name="Snackbar"
-            Panel.ZIndex="1000"
-            FontFamily="Microsoft Yahei UI Light"
-            FontSize="20"
-            Timeout="3900" />
+
     </Grid>
 </UserControl>

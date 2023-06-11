@@ -13,6 +13,8 @@ using System.Windows.Input;
 using System.Windows.Xps.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using LXIntegratedNavigation.Shared.Essentials.Navigation;
 using LXIntegratedNavigation.Shared.Models;
 using LXIntegratedNavigation.WPF.Converters;
@@ -282,12 +284,14 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         }
         var imuErrorModel = new ImuErrorModel(Arw, Vrw, StdAccBias, StdAccScale, StdGyroBias, StdGyroScale, CotAccBias, CotAccScale, CotGyroBias, CotGyroScale);
         var option = new LooseCombinationOptions(Vector.Parse(GnssLeverArmText), Vector.Parse(StdInitRText).Data, Vector.Parse(StdInitVText).Data, Vector.Parse(StdInitPhiText).Data, imuErrorModel);
-        var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation);
+        var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation, option);
         naviData = await _navigationService.LooseCombinationAsync(naviData, this);
         _snackbarService.Show("成功", "计算完成", SymbolRegular.CheckmarkCircle48, ControlAppearance.Success);
         _logService.Send(LogType.Info, "解算完毕");
+        WeakReferenceMessenger.Default.Send(naviData, "NavigationResult");
     }
     [ObservableProperty]
     double _progress = 0;
+
     public void Report(int value) => Progress = value;
 }
