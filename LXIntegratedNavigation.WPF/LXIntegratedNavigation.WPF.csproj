@@ -10,14 +10,12 @@
 
 	<ItemGroup>
 	  <None Remove="Images\background.png" />
-	  <None Remove="Images\pin.png" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Content Include="Images\background.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="Images\pin.png" />
 	</ItemGroup>
 
 	<ItemGroup>
