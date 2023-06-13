@@ -25,7 +25,7 @@ namespace LXIntegratedNavigation.WPF.Views
     public partial class StartPage : UserControl
     {
         #region Public Constructors
-        public static StartPage Instance => Current.Services.GetService<StartPage>() ?? throw new NullReferenceException();
+        public static StartPage Instance => Current.Services.GetRequiredService<StartPage>();
         public StartPageViewModel ViewModel { get; }
 
         public StartPage(StartPageViewModel viewModel)

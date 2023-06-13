@@ -20,7 +20,7 @@ public class DataService
     public IEnumerable<ImuData>? ImuDatas { get; private set; }
     public IEnumerable<GnssData>? GnssDatas { get; private set; }
 
-    public List<NavigationData>? NavigationDatas { get; private set; }
+    public NavigationData? NavigationData { get; private set; }
 
     #endregion Public Properties
 
@@ -57,8 +57,7 @@ public class DataService
         if (ImuDatas is null || GnssDatas is null)
             throw new InvalidOperationException();
         var data = new NavigationData(initTime, new(initTime, initLocation, initVelocity, initOrientation), options, ImuDatas, GnssDatas);
-        NavigationDatas ??= new();
-        NavigationDatas.Add(data);
+        NavigationData = data;
         return data;
     }
 

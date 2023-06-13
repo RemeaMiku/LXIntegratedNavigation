@@ -20,13 +20,13 @@ using Syncfusion.UI.Xaml.Charts;
 namespace LXIntegratedNavigation.WPF.Views
 {
     /// <summary>
-    /// TrajectoryPage.xaml 的交互逻辑
+    /// ChartPage.xaml 的交互逻辑
     /// </summary>
-    public partial class TrajectoryPage : UserControl
+    public partial class ChartPage : UserControl
     {
-        public static TrajectoryPage Instance => Current.Services.GetRequiredService<TrajectoryPage>();
-        public TrajectoryPageViewModel ViewModel { get; init; }
-        public TrajectoryPage(TrajectoryPageViewModel viewModel)
+        public ChartPageViewModel ViewModel { get; }
+
+        public ChartPage(ChartPageViewModel viewModel)
         {
             InitializeComponent();
             ViewModel = viewModel;

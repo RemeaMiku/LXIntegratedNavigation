@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;
 
-internal partial class WindowViewModel : ObservableObject
+public partial class WindowViewModel : ObservableObject
 {
     [ObservableProperty]
     WindowState _windowState = WindowState.Maximized;

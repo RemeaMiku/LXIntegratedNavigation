@@ -3,10 +3,79 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="urn:gong-wpf-dragdrop"
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance Type=local:FileExportPage}"
     d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignWidth="400"
     mc:Ignorable="d">
-    <Grid />
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Padding" Value="0,10" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontFamily" Value="Microsoft Yahei UI Light" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ui:DynamicScrollViewer Padding="20">
+            <StackPanel>
+                <TextBlock Text="目标路径" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox PlaceholderText="填写输出CSV文件目标路径" Text="{Binding ViewModel.TargetPath}" />
+                    <ui:Button
+                        Grid.Column="1"
+                        Margin="10,0,0,0"
+                        Appearance="Primary"
+                        Command="{Binding ViewModel.SaveResFileCommand}"
+                        Content="浏览"
+                        Icon="Folder24" />
+                </Grid>
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="备选项" />
+                        <ListBox
+                            MinHeight="100"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            BorderBrush="{StaticResource MikuRedBrush}"
+                            BorderThickness="1"
+                            ItemsSource="{Binding ViewModel.UnselectedItems}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                        <TextBlock Text="已选项" />
+                        <ListBox
+                            MinHeight="100"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            BorderBrush="{StaticResource MikuGreenBrush}"
+                            BorderThickness="1"
+                            ItemsSource="{Binding ViewModel.SelectedItems}" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </ui:DynamicScrollViewer>
+        <ui:Card Grid.Row="1">
+            <ui:Button
+                HorizontalAlignment="Center"
+                Appearance="Primary"
+                Command="{Binding ViewModel.ExportCommand}"
+                Content="导出"
+                FontSize="24"
+                Icon="Save24" />
+        </ui:Card>
+    </Grid>
 </UserControl>

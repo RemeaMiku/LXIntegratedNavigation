@@ -16,19 +16,18 @@ using System.Windows.Shapes;
 namespace LXIntegratedNavigation.WPF.Views
 {
     /// <summary>
-    /// FileExportPage.xaml 的交互逻辑
+    /// PropertyPage.xaml 的交互逻辑
     /// </summary>
-    public partial class FileExportPage : UserControl
+    public partial class PropertyPage : UserControl
     {
-        public static FileExportPage Instance => Current.Services.GetRequiredService<FileExportPage>();
+        public static PropertyPage Instance => Current.Services.GetRequiredService<PropertyPage>();
 
-        public FileExportPageViewModel ViewModel { get; init; }
-
-        public FileExportPage(FileExportPageViewModel viewModel)
+        public PropertyPageViewModel ViewModel { get; init; }
+        public PropertyPage(PropertyPageViewModel viewModel)
         {
             InitializeComponent();
-            DataContext = this;
             ViewModel = viewModel;
+            DataContext = this;
         }
     }
 }

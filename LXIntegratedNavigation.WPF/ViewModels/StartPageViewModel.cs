@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Xps.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -141,7 +142,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [NotifyDataErrorInfo]
     [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
-    string _gnssLeverArmText = "0.2350,-0.1000,0.8900";
+    string _gnssLeverArmText = "-0.0450,0.1990,-0.8510";
 
     public static ValidationResult ValidateFilePath(string filePath)
     {
@@ -228,6 +229,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         var dialog = new OpenFileDialog()
         {
             Title = "打开GNSS文件",
+            Filter = "PosMind Pos文件(*.pos)|*.pos",
             CheckFileExists = true,
             CheckPathExists = true,
             ReadOnlyChecked = true,
@@ -245,27 +247,27 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         ValidateAllProperties();
         if (HasErrors)
         {
-            _snackbarService.Show("错误", "填写存在错误", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _snackbarService.Show("错误", "表单填写存在错误", SymbolRegular.Dismiss24, ControlAppearance.Danger);
             _logService.Send(LogType.Error, "表单填写存在错误，解算已取消");
             return;
         }
-        _logService.Send(LogType.Info, $"开始读取IMU文件: {Path.GetFileName(ImuFilePath)}");
+        _logService.Send(LogType.Info, $"开始读取IMU文件: {ImuFilePath}");
         if (!await _dataService.InitializeImuDatasAsync(ImuFilePath, TimeSpan.FromSeconds(ImuInterval)))
         {
-            _snackbarService.Show("错误", "IMU文件读取出错", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
-            _logService.Send(LogType.Error, $"读取 {Path.GetFileName(ImuFilePath)} 时出错，解算已取消");
+            _snackbarService.Show("错误", "IMU文件读取出错", SymbolRegular.Dismiss24, ControlAppearance.Danger);
+            _logService.Send(LogType.Error, $"读取 {ImuFilePath} 时出错，解算已取消");
             return;
         }
-        _logService.Send(LogType.Info, $"开始读取GNSS文件: {Path.GetFileName(GnssFilePath)}");
+        _logService.Send(LogType.Info, $"开始读取GNSS结果文件: {GnssFilePath}");
         if (!await _dataService.InitializeGnssDatasAsync(GnssFilePath))
         {
-            _snackbarService.Show("错误", "GNSS文件读取出错", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
-            _logService.Send(LogType.Error, $"读取 {Path.GetFileName(GnssFilePath)} 时出错，解算已取消");
+            _snackbarService.Show("错误", "GNSS文件读取出错", SymbolRegular.Dismiss24, ControlAppearance.Danger);
+            _logService.Send(LogType.Error, $"读取 {GnssFilePath} 时出错，解算已取消");
             return;
         }
         if (_dataService.ImuDatas is null || _dataService.GnssDatas is null)
         {
-            _snackbarService.Show("错误", "未知原因", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+            _snackbarService.Show("错误", "未知原因", SymbolRegular.Dismiss24, ControlAppearance.Danger);
             _logService.Send(LogType.Error, "发生了一个未知错误，解算已取消");
             return;
         }
@@ -285,13 +287,22 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
         var imuErrorModel = new ImuErrorModel(Arw, Vrw, StdAccBias, StdAccScale, StdGyroBias, StdGyroScale, CotAccBias, CotAccScale, CotGyroBias, CotGyroScale);
         var option = new LooseCombinationOptions(Vector.Parse(GnssLeverArmText), Vector.Parse(StdInitRText).Data, Vector.Parse(StdInitVText).Data, Vector.Parse(StdInitPhiText).Data, imuErrorModel);
         var naviData = _dataService.GetNavigationData(initTime, initLocation, initVelocity, initOrientation, option);
-        naviData = await _navigationService.LooseCombinationAsync(naviData, this);
-        _snackbarService.Show("成功", "计算完成", SymbolRegular.CheckmarkCircle48, ControlAppearance.Success);
+        try
+        {
+            naviData = await _navigationService.LooseCombinationAsync(naviData, this);
+        }
+        catch (Exception e)
+        {
+            _snackbarService.Show("错误", $"解算出错：{e.Message}", SymbolRegular.Dismiss24, ControlAppearance.Danger);
+            return;
+        }
+        _snackbarService.Show("成功", "解算完成", SymbolRegular.CheckmarkCircle48, ControlAppearance.Success);
         _logService.Send(LogType.Info, "解算完毕");
         WeakReferenceMessenger.Default.Send(naviData, "NavigationResult");
     }
     [ObservableProperty]
-    double _progress = 0;
+    int _progress = 0;
 
-    public void Report(int value) => Progress = value;
+    public void Report(int value)
+        => Progress = value;
 }

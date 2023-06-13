@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:LXIntegratedNavigation.WPF"
     xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:LXIntegratedNavigation.WPF.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:StartPageViewModel}"
@@ -29,7 +30,7 @@
             BasedOn="{StaticResource {x:Type ui:SymbolIcon}}"
             TargetType="ui:SymbolIcon">
             <Setter Property="Filled" Value="True" />
-            <Setter Property="Foreground" Value="{StaticResource MikuGreenBrushAA}" />
+            <Setter Property="Foreground" Value="{StaticResource MikuGreenBrush}" />
             <Setter Property="FontSize" Value="40" />
         </Style>
         <ControlTemplate x:Key="ErrorInfoTemplate">
@@ -478,13 +479,39 @@
             Padding="20,10">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <ProgressBar Height="16" Value="{Binding Progress}" />
-                <ui:Button
+                <!--<SfLinear ProgressBar Height="16" Value="{Binding Progress}" />-->
+                <syncfusion:SfLinearProgressBar
                     Grid.Column="1"
-                    Margin="20,0,0,0"
+                    Height="16"
+                    VerticalAlignment="Center"
+                    IndicatorCornerRadius="10"
+                    Progress="{Binding Progress}"
+                    TrackColor="Transparent">
+                    <syncfusion:SfLinearProgressBar.RangeColors>
+                        <syncfusion:RangeColorCollection>
+                            <syncfusion:RangeColor
+                                End="30"
+                                IsGradient="True"
+                                Start="0"
+                                Color="{StaticResource MikuGreen55}" />
+                            <syncfusion:RangeColor
+                                End="60"
+                                IsGradient="True"
+                                Start="30"
+                                Color="{StaticResource MikuGreenAA}" />
+                            <syncfusion:RangeColor
+                                End="100"
+                                IsGradient="True"
+                                Start="60"
+                                Color="{StaticResource MikuGreen}" />
+                        </syncfusion:RangeColorCollection>
+                    </syncfusion:SfLinearProgressBar.RangeColors>
+                </syncfusion:SfLinearProgressBar>
+                <ui:Button
+                    Margin="0,0,20,0"
                     Appearance="Primary"
                     Command="{Binding StartCommand}"
                     Content="开始"

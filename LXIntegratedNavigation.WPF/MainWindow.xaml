@@ -81,19 +81,30 @@
                 </ToggleButton.Triggers>
             </ToggleButton>
             <RadioButton
+                x:Name="StartButton"
+                Command="{Binding NavigateToCommand}"
+                CommandParameter="开始"
                 Content="开始"
                 IsChecked="True"
                 Style="{StaticResource MenuRadioButtonStyle}"
                 Tag="{x:Static ui:SymbolRegular.Play28}" />
             <RadioButton
+                x:Name="TrajectoryButton"
+                Command="{Binding NavigateToCommand}"
+                CommandParameter="轨迹"
                 Content="轨迹"
                 Style="{StaticResource MenuRadioButtonStyle}"
                 Tag="{x:Static ui:SymbolRegular.ArrowRouting24}" />
-            <RadioButton
-                Content="统计"
+            <!--<RadioButton
+                x:Name="StatisticsButton"
+                Click="StatisticsButton_Click"
+                Content="属性"
                 Style="{StaticResource MenuRadioButtonStyle}"
-                Tag="{x:Static ui:SymbolRegular.ChartMultiple24}" />
+                Tag="{x:Static ui:SymbolRegular.ChartMultiple24}" />-->
             <RadioButton
+                x:Name="ExportButton"
+                Command="{Binding NavigateToCommand}"
+                CommandParameter="导出"
                 Content="导出"
                 Style="{StaticResource MenuRadioButtonStyle}"
                 Tag="{x:Static ui:SymbolRegular.Share24}" />
@@ -111,6 +122,7 @@
         <syncfusion:DockingManager
             x:Name="DockingManager"
             Grid.Column="1"
+            Margin="10"
             Background="White"
             EnableMouseHoverBackground="True"
             IsVS2010DraggingEnabled="True"
@@ -118,50 +130,5 @@
             MaximizeButtonEnabled="True"
             MinimizeButtonEnabled="True"
             UseDocumentContainer="True" />
-        <!--<DockingManager Grid.Column="1" Background="White">
-            <DockingManager.Theme>
-                <aakthemes:VisualStudio2022Light />
-            </DockingManager.Theme>
-            <LayoutRoot>
-                <LayoutPanel Orientation="Horizontal">
-                    <LayoutPanel Orientation="Vertical">
-                        <LayoutDocumentPaneGroup>
-                            <LayoutDocumentPane x:Name="DocumentPane">
-                                <LayoutDocument Title="开始" Content="{x:Static v:StartPage.Instance}" />
-                            </LayoutDocumentPane>
-                        </LayoutDocumentPaneGroup>
-                        <LayoutAnchorablePaneGroup
-                            DockHeight="200"
-                            DockMinHeight="100"
-                            FloatingHeight="180">
-                            <LayoutAnchorablePane>
-                                <LayoutAnchorable
-                                    Title="输出"
-                                    CanAutoHide="False"
-                                    CanClose="True"
-                                    Content="{x:Static v:LogPage.Instance}" />
-                                <LayoutAnchorable
-                                    Title="统计"
-                                    CanAutoHide="False"
-                                    CanClose="True">
-                                    <TextBlock Padding="5" Text="统计" />
-                                </LayoutAnchorable>
-                            </LayoutAnchorablePane>
-                        </LayoutAnchorablePaneGroup>
-                    </LayoutPanel>
-                    <LayoutAnchorablePaneGroup
-                        DockMinWidth="100"
-                        DockWidth="200"
-                        FloatingWidth="270">
-                        <LayoutAnchorablePane DockWidth="240" FloatingWidth="20">
-                            <LayoutAnchorable
-                                Title="属性"
-                                CanAutoHide="True"
-                                CanClose="True" />
-                        </LayoutAnchorablePane>
-                    </LayoutAnchorablePaneGroup>
-                </LayoutPanel>
-            </LayoutRoot>
-        </DockingManager>-->
     </Grid>
 </Window>

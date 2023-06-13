@@ -26,15 +26,15 @@ public partial class LogViewModel : ObservableObject
     Brush _foreground;
     static readonly Dictionary<LogType, Brush> _brushes = new()
     {
-        {LogType.Info, new SolidColorBrush(Colors.SkyBlue) },
-        {LogType.Warning, new SolidColorBrush(Colors.LightYellow) },
+        {LogType.Info, new SolidColorBrush(Colors.DeepSkyBlue) },
+        {LogType.Warning, new SolidColorBrush(Colors.Orange) },
         {LogType.Error, new SolidColorBrush(Colors.Red) }
     };
     static readonly Dictionary<LogType, SymbolRegular> _symbols = new()
     {
         {LogType.Info, SymbolRegular.Info24 },
         {LogType.Warning,SymbolRegular.Warning24 },
-        {LogType.Error, SymbolRegular.ErrorCircle24 }
+        {LogType.Error, SymbolRegular.DismissCircle24 }
     };
     public LogViewModel(Log log)
     {
