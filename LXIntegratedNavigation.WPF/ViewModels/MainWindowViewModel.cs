@@ -35,6 +35,7 @@ public partial class MainWindowViewModel : WindowViewModel
             {
                 Header = "开始",
                 State = DockState.Document,
+                CanMaximize = true,
                 Content = StartPage.Instance
             }
         },

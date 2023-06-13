@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,6 +53,25 @@ namespace LXIntegratedNavigation.WPF.Views
                 using Stream fs = sfd.OpenFile();
                 Chart.Save(fs, new PngBitmapEncoder());
             }
+        }
+
+
+
+        private void DisplayButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            //if (ViewModel.Poses.Count == 0)
+            //    return;
+            //ViewModel.DisplayPose.Add(ViewModel.Poses[0]);
+            //await Task.Run(() =>
+            //{
+            //    for (int i = 0; i < ViewModel.Poses.Count - 1; i++)
+            //    {
+            //        var timeSpan = ViewModel.Poses[i + 1].TimeSpan - ViewModel.DisplayPose[0].TimeSpan;
+            //        Thread.Sleep(timeSpan);
+            //        ViewModel.DisplayPose[0] = ViewModel.Poses[i + 1];
+            //    }
+            //});
         }
     }
 }

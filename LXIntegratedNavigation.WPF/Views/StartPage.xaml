@@ -195,7 +195,7 @@
                                 Grid.Column="5"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" h " />
+                                Formula=" s " />
                         </Grid>
                         <TextBlock Text="陀螺仪零偏" />
                         <Grid>
@@ -233,7 +233,7 @@
                                 Grid.Column="5"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" h " />
+                                Formula=" s " />
                         </Grid>
                         <TextBlock Text="加速度计比例因子" />
                         <Grid>
@@ -271,7 +271,7 @@
                                 Grid.Column="5"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" h " />
+                                Formula=" s " />
                         </Grid>
                         <TextBlock Text="陀螺仪比例因子" />
                         <Grid>
@@ -309,7 +309,7 @@
                                 Grid.Column="5"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" h " />
+                                Formula=" s " />
                         </Grid>
                     </StackPanel>
                 </ui:CardExpander>

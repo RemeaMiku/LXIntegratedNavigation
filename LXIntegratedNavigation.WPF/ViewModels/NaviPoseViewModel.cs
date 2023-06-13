@@ -100,6 +100,9 @@ public class NaviPoseViewModel : ObservableObject
     [Category("位置")]
     [DisplayName("ECEF-Z")]
     public double Z => Ecef.Z;
+    [Category("速度")]
+    [DisplayName("速度大小")]
+    public double V => _pose.Velocity.Norm();
 
     public NaviPoseViewModel(NaviPose pose, NaviPose initPose)
     {

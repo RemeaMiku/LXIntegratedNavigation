@@ -10,12 +10,14 @@
 
 	<ItemGroup>
 	  <None Remove="Images\background.png" />
+	  <None Remove="Images\pin.png" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Content Include="Images\background.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="Images\pin.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -24,6 +26,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="Syncfusion.PropertyGrid.WPF" Version="21.2.9" />
 		<PackageReference Include="Syncfusion.SfChart.WPF" Version="21.2.9" />
+		<PackageReference Include="Syncfusion.SfGauge.WPF" Version="21.2.10" />
 		<PackageReference Include="Syncfusion.SfProgressBar.WPF" Version="21.2.10" />
 		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="21.2.9" />
 		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="21.2.9" />

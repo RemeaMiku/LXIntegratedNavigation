@@ -14,8 +14,8 @@ namespace LXIntegratedNavigation.WPF.Views;
 /// </summary>
 public class ListBoxBehavior
 {
-    static readonly Dictionary<ListBox, Capture> Associations =
-          new Dictionary<ListBox, Capture>();
+    static readonly Dictionary<ListBox, Capture> _associations =
+          new();
 
     public static bool GetScrollOnNewItem(DependencyObject obj)
     {
@@ -52,8 +52,8 @@ public class ListBoxBehavior
         {
             listBox.Loaded -= ListBox_Loaded;
             listBox.Unloaded -= ListBox_Unloaded;
-            if (Associations.ContainsKey(listBox))
-                Associations[listBox].Dispose();
+            if (_associations.ContainsKey(listBox))
+                _associations[listBox].Dispose();
             var itemsSourcePropertyDescriptor = TypeDescriptor.GetProperties(listBox)["ItemsSource"];
             itemsSourcePropertyDescriptor?.RemoveValueChanged(listBox, ListBox_ItemsSourceChanged);
         }
@@ -64,16 +64,16 @@ public class ListBoxBehavior
         if (sender is null)
             return;
         var listBox = (ListBox)sender;
-        if (Associations.ContainsKey(listBox))
-            Associations[listBox].Dispose();
-        Associations[listBox] = new Capture(listBox);
+        if (_associations.ContainsKey(listBox))
+            _associations[listBox].Dispose();
+        _associations[listBox] = new Capture(listBox);
     }
 
     static void ListBox_Unloaded(object sender, RoutedEventArgs e)
     {
         var listBox = (ListBox)sender;
-        if (Associations.ContainsKey(listBox))
-            Associations[listBox].Dispose();
+        if (_associations.ContainsKey(listBox))
+            _associations[listBox].Dispose();
         listBox.Unloaded -= ListBox_Unloaded;
     }
 
@@ -82,21 +82,21 @@ public class ListBoxBehavior
         var listBox = (ListBox)sender;
         if (listBox.Items is not INotifyCollectionChanged incc) return;
         listBox.Loaded -= ListBox_Loaded;
-        Associations[listBox] = new Capture(listBox);
+        _associations[listBox] = new Capture(listBox);
     }
 
     class Capture : IDisposable
     {
-        private readonly ListBox listBox;
-        private readonly INotifyCollectionChanged? incc;
+        private readonly ListBox _listBox;
+        private readonly INotifyCollectionChanged? _incc;
 
         public Capture(ListBox listBox)
         {
-            this.listBox = listBox;
-            incc = (INotifyCollectionChanged)listBox.ItemsSource;
-            if (incc != null)
+            this._listBox = listBox;
+            _incc = (INotifyCollectionChanged)listBox.ItemsSource;
+            if (_incc != null)
             {
-                incc.CollectionChanged += Incc_CollectionChanged;
+                _incc.CollectionChanged += Incc_CollectionChanged;
             }
         }
 
@@ -104,15 +104,15 @@ public class ListBoxBehavior
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                listBox.ScrollIntoView(e.NewItems?[0]);
-                listBox.SelectedItem = e.NewItems?[0];
+                _listBox.ScrollIntoView(e.NewItems?[0]);
+                _listBox.SelectedItem = e.NewItems?[0];
             }
         }
 
         public void Dispose()
         {
-            if (incc != null)
-                incc.CollectionChanged -= Incc_CollectionChanged;
+            if (_incc != null)
+                _incc.CollectionChanged -= Incc_CollectionChanged;
         }
     }
 }
