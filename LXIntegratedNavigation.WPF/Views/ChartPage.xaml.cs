@@ -24,7 +24,7 @@ namespace LXIntegratedNavigation.WPF.Views
     /// </summary>
     public partial class ChartPage : UserControl
     {
-        public ChartPageViewModel ViewModel { get; }
+        #region Public Constructors
 
         public ChartPage(ChartPageViewModel viewModel)
         {
@@ -32,6 +32,16 @@ namespace LXIntegratedNavigation.WPF.Views
             ViewModel = viewModel;
             DataContext = this;
         }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        public ChartPageViewModel ViewModel { get; }
+
+        #endregion Public Properties
+
+        #region Private Methods
 
         private void SfChart_SelectionChanged(object sender, ChartSelectionChangedEventArgs e)
         {
@@ -53,5 +63,7 @@ namespace LXIntegratedNavigation.WPF.Views
                 Chart.Save(fs, new PngBitmapEncoder());
             }
         }
+
+        #endregion Private Methods
     }
 }

@@ -10,6 +10,8 @@ namespace LXIntegratedNavigation.WPF.Converters;
 
 public class WindowStateToCommandConverter : BaseConverter<WindowStateToCommandConverter>
 {
+    #region Public Methods
+
     public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is WindowState state)
@@ -23,4 +25,6 @@ public class WindowStateToCommandConverter : BaseConverter<WindowStateToCommandC
     {
         throw new NotImplementedException();
     }
+
+    #endregion Public Methods
 }

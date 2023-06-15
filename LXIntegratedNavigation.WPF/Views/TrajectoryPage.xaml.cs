@@ -25,14 +25,25 @@ namespace LXIntegratedNavigation.WPF.Views
     /// </summary>
     public partial class TrajectoryPage : UserControl
     {
-        public static TrajectoryPage Instance => Current.Services.GetRequiredService<TrajectoryPage>();
-        public TrajectoryPageViewModel ViewModel { get; init; }
+        #region Public Constructors
+
         public TrajectoryPage(TrajectoryPageViewModel viewModel)
         {
             InitializeComponent();
             ViewModel = viewModel;
             DataContext = this;
         }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        public static TrajectoryPage Instance => Current.Services.GetRequiredService<TrajectoryPage>();
+        public TrajectoryPageViewModel ViewModel { get; init; }
+
+        #endregion Public Properties
+
+        #region Private Methods
 
         private void SfChart_SelectionChanged(object sender, ChartSelectionChangedEventArgs e)
         {
@@ -73,5 +84,7 @@ namespace LXIntegratedNavigation.WPF.Views
             //    }
             //});
         }
+
+        #endregion Private Methods
     }
 }

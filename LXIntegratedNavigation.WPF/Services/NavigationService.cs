@@ -14,7 +14,13 @@ namespace LXIntegratedNavigation.WPF.Services;
 
 public class NavigationService
 {
+    #region Public Properties
+
     public InertialNavigation Ins { get; } = new(new Grs80NormalGravityModel());
+
+    #endregion Public Properties
+
+    #region Public Methods
 
     public async Task<NavigationData> LooseCombinationAsync(NavigationData data, IProgress<int>? progress = null)
     {
@@ -31,6 +37,8 @@ public class NavigationService
         // Return the data
         return data;
     }
+
+    #endregion Public Methods
 
 
 }

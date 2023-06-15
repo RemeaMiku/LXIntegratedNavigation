@@ -9,8 +9,14 @@ namespace LXIntegratedNavigation.WPF.Services;
 
 public class LogService
 {
+    #region Public Properties
+
     public ILogReceiver? LogReceiver { get; set; }
     public List<Log> Logs { get; } = new();
+
+    #endregion Public Properties
+
+    #region Public Methods
 
     public void Send(LogType type, string message)
     {
@@ -18,4 +24,6 @@ public class LogService
         Logs.Add(log);
         LogReceiver?.Receive(log);
     }
+
+    #endregion Public Methods
 }

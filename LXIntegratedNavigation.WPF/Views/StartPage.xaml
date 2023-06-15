@@ -334,7 +334,6 @@
                                 VerticalAlignment="Center"
                                 Formula="m" />
                         </Grid>
-
                     </StackPanel>
                 </ui:CardExpander>
                 <ui:CardExpander>
@@ -380,7 +379,6 @@
                                 Formula="m" />
                         </Grid>
 
-
                         <TextBlock Text="初始速度(北向,东向,地向)" />
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -408,7 +406,6 @@
                                 VerticalAlignment="Center"
                                 Formula="m/s" />
                         </Grid>
-
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -520,6 +517,5 @@
                     IconFilled="True" />
             </Grid>
         </ui:Card>
-
     </Grid>
 </UserControl>

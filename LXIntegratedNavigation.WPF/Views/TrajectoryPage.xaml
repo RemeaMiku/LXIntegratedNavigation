@@ -48,8 +48,6 @@
                         Visibility="Visible" />
                 </Grid>
                 <Path Data="M 0,0 L 40,0 Q 50,10 40,20 L 0,20 Q -10,10 0,0 Z M 10,5 A 2.5,2.5 0 1 1 15,5 A 2.5,2.5 0 1 1 10,5 Z M 30,5 A 2.5,2.5 0 1 1 35,5 A 2.5,2.5 0 1 1 30,5 Z M 10,15 A 2.5,2.5 0 1 1 15,15 A 2.5,2.5 0 1 1 10,15 Z M 30,15 A 2.5,2.5 0 1 1 35,15 A 2.5,2.5 0 1 1 30,15 Z" Fill="Black" />
-
-
             </Grid>
         </DataTemplate>
     </UserControl.Resources>

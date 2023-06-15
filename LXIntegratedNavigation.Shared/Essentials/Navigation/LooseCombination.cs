@@ -7,12 +7,7 @@ namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 
 public partial class LooseCombination
 {
-    public INormalGravityModel GravityModel => InertialNavigation.GravityModel;
-    public InertialNavigation InertialNavigation { get; init; }
-    public KalmanFilter Filter { get; init; }
-    public LooseCombinationOptions Options { get; init; }
-
-    readonly Matrix _q;
+    #region Public Constructors
 
     public LooseCombination(INormalGravityModel gravityService, LooseCombinationOptions options)
     {
@@ -30,52 +25,18 @@ public partial class LooseCombination
         _q = Buildq();
     }
 
-    private Matrix BuildInitP()
-    => Matrix.FromArrayAsDiagonal
-            (
-                Pow(Options.StdInitR_n, 2), Pow(Options.StdInitR_e, 2), Pow(Options.StdInitR_d, 2),
-                Pow(Options.StdInitV_n, 2), Pow(Options.StdInitV_e, 2), Pow(Options.StdInitV_d, 2),
-                Pow(Options.StdInitPhi_n.Radians, 2), Pow(Options.StdInitPhi_e.Radians, 2), Pow(Options.StdInitPhi_d.Radians, 2),
-                Pow(Options.StdGyroBias, 2), Pow(Options.StdGyroBias, 2), Pow(Options.StdGyroBias, 2),
-                Pow(Options.StdAccBias, 2), Pow(Options.StdAccBias, 2), Pow(Options.StdAccBias, 2),
-                Pow(Options.StdGyroScale, 2), Pow(Options.StdGyroScale, 2), Pow(Options.StdGyroScale, 2),
-                Pow(Options.StdAccScale, 2), Pow(Options.StdAccScale, 2), Pow(Options.StdAccScale, 2)
-            );
+    #endregion Public Constructors
 
-    protected (NaviPose Pose, ImuData Imu) Update(NaviPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null)
-    {
-        var curPose = InertialNavigation.Mechanizations(prePose, preImu, curImu, Abs((curImu.TimeStamp - preImu.TimeStamp).TotalSeconds));
-        var gravity = GravityModel.NormalGravityAsVectorAt(curPose.Latitude, curPose.H);
-        var isZeroVelocity = IsZeroVelocity(curImu.Accelerometer, gravity);
-        var Phi_kSub1Tok = BuildPhi(curPose, curImu);
-        var I = Matrix.Identity(Phi_kSub1Tok.RowCount);
-        if (curGnss is null)
-        {
-            if (isZeroVelocity)
-            {
-                var HZR = BuildHZRFromZupt(curPose);
-                var (X_k, _) = Filter.Solve(Phi_kSub1Tok, HZR);
-                curPose = CorrectPose(X_k, curPose);
-                curImu = CorrectImuData(X_k, curImu);
-                Filter.X[0..9] = new(9);
-                Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
-                return (curPose, curImu);
-            }
-            Filter.Solve(Phi_kSub1Tok);
-            Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
-            return (curPose, curImu);
-        }
-        else
-        {
-            var HZR = BuildHZRFromGnss(curPose, curImu, curGnss);
-            var (X_k, _) = Filter.Solve(Phi_kSub1Tok, HZR);
-            curPose = CorrectPose(X_k, curPose);
-            curImu = CorrectImuData(X_k, curImu);
-            Filter.X[0..9] = new(9);
-            Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
-            return (curPose, curImu);
-        }
-    }
+    #region Public Properties
+
+    public INormalGravityModel GravityModel => InertialNavigation.GravityModel;
+    public InertialNavigation InertialNavigation { get; init; }
+    public KalmanFilter Filter { get; init; }
+    public LooseCombinationOptions Options { get; init; }
+
+    #endregion Public Properties
+
+    #region Public Methods
 
     public IEnumerable<NaviPose> Solve(NaviPose initPose, IEnumerable<ImuData> imuDatas, IEnumerable<GnssData> gnssDatas, GpsTime? initTime = null, IProgress<int>? progress = null)
     {
@@ -127,9 +88,120 @@ public partial class LooseCombination
         }
     }
 
+    #endregion Public Methods
 
+    #region Protected Methods
 
+    protected (NaviPose Pose, ImuData Imu) Update(NaviPose prePose, ImuData preImu, ImuData curImu, GnssData? curGnss = null)
+    {
+        var curPose = InertialNavigation.Mechanizations(prePose, preImu, curImu, Abs((curImu.TimeStamp - preImu.TimeStamp).TotalSeconds));
+        var gravity = GravityModel.NormalGravityAsVectorAt(curPose.Latitude, curPose.H);
+        var isZeroVelocity = IsZeroVelocity(curImu.Accelerometer, gravity);
+        var Phi_kSub1Tok = BuildPhi(curPose, curImu);
+        if (curGnss is null)
+        {
+            if (isZeroVelocity)
+            {
+                var HZR = BuildHZRFromZupt(curPose);
+                var (X_k, _) = Filter.Solve(Phi_kSub1Tok, HZR);
+                curPose = CorrectPose(X_k, curPose);
+                curImu = CorrectImuData(X_k, curImu);
+                Filter.X[0..9] = new(9);
+                Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
+                return (curPose, curImu);
+            }
+            Filter.Solve(Phi_kSub1Tok);
+            Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
+            return (curPose, curImu);
+        }
+        else
+        {
+            var HZR = BuildHZRFromGnss(curPose, curImu, curGnss);
+            var (X_k, _) = Filter.Solve(Phi_kSub1Tok, HZR);
+            curPose = CorrectPose(X_k, curPose);
+            curImu = CorrectImuData(X_k, curImu);
+            Filter.X[0..9] = new(9);
+            Filter.Q = BuildQ(curPose, curImu, Phi_kSub1Tok);
+            return (curPose, curImu);
+        }
+    }
 
+    #endregion Protected Methods
+
+    #region Private Fields
+
+    readonly Matrix _q;
+
+    #endregion Private Fields
+
+    #region Private Methods
+
+    private static Matrix BuildG(NaviPose pose)
+    {
+        var C_b_n = pose.Orientation.Matrix;
+        var I = Matrix.Identity(3);
+        var O = new Matrix(3, 3);
+        return Matrix.FromBlockMatrixArray(new[,]
+        {
+            {O,O,O,O,O,O},
+            {C_b_n,O,O,O,O,O },
+            {O,C_b_n,O,O,O,O },
+            {O,O,I,O,O,O},
+            {O,O,O,I,O,O, },
+            {O,O,O,O,I,O },
+            {O,O,O,O,O,I }
+        });
+    }
+
+    private static Matrix BuildR_r(GnssData gnssData)
+
+        => Matrix.FromArrayAsDiagonal(Pow(gnssData.StdR_n, 2), Pow(gnssData.StdR_e, 2), Pow(gnssData.StdR_d, 2));
+
+    private static Matrix BuildR_v(GnssData gnssData)
+        => Matrix.FromArrayAsDiagonal(Pow(gnssData.StdV_n, 2), Pow(gnssData.StdV_e, 2), Pow(gnssData.StdV_d, 2));
+
+    private static Vector BuildZ_v(NaviPose pose, GnssData gnssData) => pose.Velocity - gnssData.Velocity;
+
+    private static ImuData CorrectImuData(Vector X, ImuData imuData)
+    {
+        var b_g = X[9..12];
+        var b_a = X[12..15];
+        var s_g = X[15..18];
+        var s_a = X[18..];
+        var S_g = Matrix.FromVectorAsDiagonal(s_g);
+        var S_a = Matrix.FromVectorAsDiagonal(s_a);
+        var newAcc = imuData.Accelerometer - b_a - S_a * imuData.Accelerometer;
+        var newGyro = imuData.Gyroscope - b_g - S_g * imuData.Gyroscope;
+        return imuData with { Accelerometer = newAcc, Gyroscope = newGyro, IsVirtual = true };
+    }
+
+    private static NaviPose CorrectPose(Vector X, NaviPose pose)
+    {
+        var dr = X[..3];
+        var r_M = Grs80.M(pose.Latitude);
+        var r_N = Grs80.N(pose.Latitude);
+        var D_R_inv = Matrix.FromArrayAsDiagonal(1 / (r_M + pose.H), 1 / ((r_N + pose.H) * Cos(pose.Latitude)), -1);
+        var dc = D_R_inv * dr;
+        var newLocation = GeodeticCoord.FromVector(pose.Location.ToVector() - dc);
+        var dv = X[3..6];
+        var newVelocity = pose.Velocity - dv;
+        var dphi = X[6..9];
+        var C_p_n = Matrix.Identity(3) - Matrix.FromAxialVector(dphi);
+        var newMatrix = C_p_n.Inverse() * pose.Orientation.Matrix;
+        return pose with { Location = newLocation, Velocity = newVelocity, Orientation = new(newMatrix) };
+    }
+
+    private Matrix BuildInitP()
+                            => Matrix.FromArrayAsDiagonal
+            (
+                Pow(Options.StdInitR_n, 2), Pow(Options.StdInitR_e, 2), Pow(Options.StdInitR_d, 2),
+                Pow(Options.StdInitV_n, 2), Pow(Options.StdInitV_e, 2), Pow(Options.StdInitV_d, 2),
+                Pow(Options.StdInitPhi_n.Radians, 2), Pow(Options.StdInitPhi_e.Radians, 2), Pow(Options.StdInitPhi_d.Radians, 2),
+                Pow(Options.StdGyroBias, 2), Pow(Options.StdGyroBias, 2), Pow(Options.StdGyroBias, 2),
+                Pow(Options.StdAccBias, 2), Pow(Options.StdAccBias, 2), Pow(Options.StdAccBias, 2),
+                Pow(Options.StdGyroScale, 2), Pow(Options.StdGyroScale, 2), Pow(Options.StdGyroScale, 2),
+                Pow(Options.StdAccScale, 2), Pow(Options.StdAccScale, 2), Pow(Options.StdAccScale, 2)
+            );
     private Matrix BuildF(NaviPose pose, ImuData imuData)
     {
         var f = imuData.Accelerometer;
@@ -203,24 +275,6 @@ public partial class LooseCombination
             { O, O, O, O, O, O,-I/ Options.CotAccScale }
         });
     }
-
-    private static Matrix BuildG(NaviPose pose)
-    {
-        var C_b_n = pose.Orientation.Matrix;
-        var I = Matrix.Identity(3);
-        var O = new Matrix(3, 3);
-        return Matrix.FromBlockMatrixArray(new[,]
-        {
-            {O,O,O,O,O,O},
-            {C_b_n,O,O,O,O,O },
-            {O,C_b_n,O,O,O,O },
-            {O,O,I,O,O,O},
-            {O,O,O,I,O,O, },
-            {O,O,O,O,I,O },
-            {O,O,O,O,O,I }
-        });
-    }
-
     private Matrix BuildH_r(NaviPose pose)
     {
         var C_b_nlx = Matrix.FromAxialVector(pose.Orientation.Matrix * Options.GnssLeverArm);
@@ -290,15 +344,6 @@ public partial class LooseCombination
         var Q_k = 0.5 * imuData.IntervalSeconds * (Phi * G_kq_kGt_k * Phi.Transpose() + G_kq_kGt_k);
         return Q_k;
     }
-
-    private static Matrix BuildR_r(GnssData gnssData)
-
-        => Matrix.FromArrayAsDiagonal(Pow(gnssData.StdR_n, 2), Pow(gnssData.StdR_e, 2), Pow(gnssData.StdR_d, 2));
-
-
-    private static Matrix BuildR_v(GnssData gnssData)
-        => Matrix.FromArrayAsDiagonal(Pow(gnssData.StdV_n, 2), Pow(gnssData.StdV_e, 2), Pow(gnssData.StdV_d, 2));
-
     private (Matrix H, Vector Z, Matrix R) BuildHZRFromGnss(NaviPose pose, ImuData imuData, GnssData gnssData)
     {
         var H_v = BuildH_v(pose, imuData);
@@ -324,34 +369,5 @@ public partial class LooseCombination
         return z_r;
     }
 
-    private static Vector BuildZ_v(NaviPose pose, GnssData gnssData) => pose.Velocity - gnssData.Velocity;
-
-    private static ImuData CorrectImuData(Vector X, ImuData imuData)
-    {
-        var b_g = X[9..12];
-        var b_a = X[12..15];
-        var s_g = X[15..18];
-        var s_a = X[18..];
-        var S_g = Matrix.FromVectorAsDiagonal(s_g);
-        var S_a = Matrix.FromVectorAsDiagonal(s_a);
-        var newAcc = imuData.Accelerometer - b_a - S_a * imuData.Accelerometer;
-        var newGyro = imuData.Gyroscope - b_g - S_g * imuData.Gyroscope;
-        return imuData with { Accelerometer = newAcc, Gyroscope = newGyro, IsVirtual = true };
-    }
-
-    private static NaviPose CorrectPose(Vector X, NaviPose pose)
-    {
-        var dr = X[..3];
-        var r_M = Grs80.M(pose.Latitude);
-        var r_N = Grs80.N(pose.Latitude);
-        var D_R_inv = Matrix.FromArrayAsDiagonal(1 / (r_M + pose.H), 1 / ((r_N + pose.H) * Cos(pose.Latitude)), -1);
-        var dc = D_R_inv * dr;
-        var newLocation = GeodeticCoord.FromVector(pose.Location.ToVector() - dc);
-        var dv = X[3..6];
-        var newVelocity = pose.Velocity - dv;
-        var dphi = X[6..9];
-        var C_p_n = Matrix.Identity(3) - Matrix.FromAxialVector(dphi);
-        var newMatrix = C_p_n.Inverse() * pose.Orientation.Matrix;
-        return pose with { Location = newLocation, Velocity = newVelocity, Orientation = new(newMatrix) };
-    }
+    #endregion Private Methods
 }

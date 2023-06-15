@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:cv="clr-namespace:LXIntegratedNavigation.WPF.Converters">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!--  无悬停按钮  -->
     <Style x:Key="HoverlessButton" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
