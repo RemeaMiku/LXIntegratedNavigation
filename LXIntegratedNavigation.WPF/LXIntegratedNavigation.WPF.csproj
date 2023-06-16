@@ -37,4 +37,10 @@
 		<ProjectReference Include="..\LXIntegratedNavigation.Shared\LXIntegratedNavigation.Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="NaviSharp">
+	    <HintPath>..\NaviSharp.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>

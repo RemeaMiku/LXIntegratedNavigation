@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LXIntegratedNavigation.Shar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LXIntegratedNavigation.WPF", "LXIntegratedNavigation.WPF\LXIntegratedNavigation.WPF.csproj", "{0D1A7C3A-BDD6-45B1-AF82-59535D93A10B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NaviSharp", "..\..\..\dotnet\NaviSharp\NaviSharp\NaviSharp.csproj", "{BF5B5A40-166D-4170-82E4-650E85E2E6C7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{0D1A7C3A-BDD6-45B1-AF82-59535D93A10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D1A7C3A-BDD6-45B1-AF82-59535D93A10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D1A7C3A-BDD6-45B1-AF82-59535D93A10B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF5B5A40-166D-4170-82E4-650E85E2E6C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF5B5A40-166D-4170-82E4-650E85E2E6C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF5B5A40-166D-4170-82E4-650E85E2E6C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF5B5A40-166D-4170-82E4-650E85E2E6C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

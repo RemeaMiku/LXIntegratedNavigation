@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\dotnet\NaviSharp\NaviSharp\NaviSharp.csproj" />
+    <Reference Include="NaviSharp">
+      <HintPath>..\NaviSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
