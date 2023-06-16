@@ -2,8 +2,6 @@
 
 namespace LXIntegratedNavigation.Shared.Essentials.Navigation;
 
-//public record class LooseCombinationOptions(Vector GnssLeverArm, Angle StdInitPhi_n, Angle StdInitPhi_e, Angle StdInitPhi_d, double Arw, double Vrw, double StdAccBias, double StdAccScale, double StdGyroBias, double StdGyroScale, double StdInitR_n, double StdInitR_e, double StdInitR_d, double StdInitV_n, double StdInitV_e, double StdInitV_d, double RelevantTimeAccBias, double RelevantTimeAccScale, double RelevantTimeGyroBias, double RelevantTimeGyroScale);
-
 public record class LooseCombinationOptions
 {
     public Vector GnssLeverArm { get; init; }

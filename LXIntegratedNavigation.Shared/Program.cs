@@ -1,6 +1,4 @@
-﻿using LXIntegratedNavigation.Shared.Essentials.Navigation;
-using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
-using LXIntegratedNavigation.Shared.Models;
+﻿using LXIntegratedNavigation.Shared.Models;
 
 
 //var imuDatasPath = "D:\\RemeaMiku study\\course in progress\\2023大三实习\\友谊广场0511\\ProcessedData\\wide_Rover\\20230511_wide_imu.ASC";

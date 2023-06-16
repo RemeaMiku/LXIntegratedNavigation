@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
+﻿using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
 using LXIntegratedNavigation.Shared.Filters;
 using LXIntegratedNavigation.Shared.Models;
 

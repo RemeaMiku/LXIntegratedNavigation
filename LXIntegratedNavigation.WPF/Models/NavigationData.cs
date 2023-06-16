@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using LXIntegratedNavigation.Shared.Essentials.Navigation;
 using LXIntegratedNavigation.Shared.Models;
 using NaviSharp;

@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LXIntegratedNavigation.WPF.Models;
-using Wpf.Ui.Appearance;
-using Wpf.Ui.Controls;
 using Brush = System.Windows.Media.Brush;
-using Color = System.Windows.Media.Color;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;
 

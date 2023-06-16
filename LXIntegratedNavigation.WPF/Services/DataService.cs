@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 using LXIntegratedNavigation.Shared.Essentials.Navigation;
-using LXIntegratedNavigation.Shared.Helpers;
 using LXIntegratedNavigation.Shared.Models;
 using LXIntegratedNavigation.WPF.Models;
 using NaviSharp;

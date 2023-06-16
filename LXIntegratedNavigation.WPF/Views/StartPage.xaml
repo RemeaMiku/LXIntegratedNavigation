@@ -144,7 +144,7 @@
                                 Grid.Column="1"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" {}^\circ / \sqrt{h}" />
+                                Formula=" {}^\circ / \sqrt{s}" />
                         </Grid>
                         <TextBlock Text="速度随机游走(VRW)" />
                         <Grid>
@@ -157,7 +157,7 @@
                                 Grid.Column="1"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" m/s / \sqrt{h}" />
+                                Formula=" m/s / \sqrt{s}" />
                         </Grid>
                         <TextBlock Text="加速度计零偏" />
                         <Grid>
@@ -181,7 +181,7 @@
                                 Grid.Column="2"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" mGal " />
+                                Formula=" m/s^2 " />
                             <TextBlock
                                 Grid.Column="3"
                                 Margin="20,0,10,0"
@@ -219,7 +219,7 @@
                                 Grid.Column="2"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" m/s / \sqrt{h}" />
+                                Formula=" {}^\circ/s " />
                             <TextBlock
                                 Grid.Column="3"
                                 Margin="20,0,10,0"
@@ -257,7 +257,7 @@
                                 Grid.Column="2"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" ppm " />
+                                Formula=" 1 " />
                             <TextBlock
                                 Grid.Column="3"
                                 Margin="20,0,10,0"
@@ -295,7 +295,7 @@
                                 Grid.Column="2"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                Formula=" ppm " />
+                                Formula=" 1 " />
                             <TextBlock
                                 Grid.Column="3"
                                 Margin="20,0,10,0"

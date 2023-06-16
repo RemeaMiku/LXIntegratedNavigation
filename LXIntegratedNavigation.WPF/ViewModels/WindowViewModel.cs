@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System.Windows.Input;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;

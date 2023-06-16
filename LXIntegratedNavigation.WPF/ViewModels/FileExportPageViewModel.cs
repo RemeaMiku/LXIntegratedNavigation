@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LXIntegratedNavigation.Shared.Models;
 using LXIntegratedNavigation.WPF.Services;
 using Microsoft.Win32;
-using NaviSharp;
 using Wpf.Ui.Mvvm.Contracts;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;
@@ -54,9 +48,12 @@ public partial class FileExportPageViewModel : ObservableObject
         "纬度B(°)",
         "经度L(°)",
         "大地高H(m)",
+        "东向距离RE(m)",
+        "北向距离RN(m)",
+        "垂向距离RU(m)",
         "北向速度VN(m/s)",
         "东向速度VE(m/s)",
-        "垂向速度VD(m/s)",
+        "垂向速度VU(m/s)",
         "航向Yaw(°)",
         "俯仰Pitch(°)",
         "横滚Roll(°)"
@@ -68,10 +65,7 @@ public partial class FileExportPageViewModel : ObservableObject
         "ECEF-X(m)",
         "ECEF-Y(m)",
         "ECEF-Z(m)",
-        "垂向速度VU(m/s)",
-        "东向距离RE(m)",
-        "北向距离RN(m)",
-        "垂向距离RU(m)"
+        "垂向速度VD(m/s)",
     };
 
     [ObservableProperty]

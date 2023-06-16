@@ -6,5 +6,4 @@ global using static NaviSharp.EarthEllipsoid;
 global using static NaviSharp.Constants;
 global using Vector = NaviSharp.Vector<double>;
 global using Matrix = NaviSharp.Matrix<double>;
-global using static LXIntegratedNavigation.Shared.Helpers.FileHelper;
 global using static LXIntegratedNavigation.Shared.Helpers.BuildHelper;

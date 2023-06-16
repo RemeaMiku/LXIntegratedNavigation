@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using LXIntegratedNavigation.Shared.Essentials.Navigation;
 using LXIntegratedNavigation.Shared.Essentials.NormalGravityModel;
-using LXIntegratedNavigation.Shared.Models;
 using LXIntegratedNavigation.WPF.Models;
-using NaviSharp;
 
 namespace LXIntegratedNavigation.WPF.Services;
 

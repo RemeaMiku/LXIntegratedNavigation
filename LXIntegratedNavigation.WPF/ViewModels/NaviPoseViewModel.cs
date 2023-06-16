@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LXIntegratedNavigation.Shared.Models;
 using NaviSharp;
-using Syncfusion.Windows.PropertyGrid;
 
 namespace LXIntegratedNavigation.WPF.ViewModels;
 

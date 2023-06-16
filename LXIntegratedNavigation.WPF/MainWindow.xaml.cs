@@ -1,13 +1,6 @@
-﻿using System.Linq;
-using System.Windows;
-using System.Windows.Media;
-using LXIntegratedNavigation.WPF.Services;
+﻿using LXIntegratedNavigation.WPF.Services;
 using Syncfusion.SfSkinManager;
-using Syncfusion.Themes.FluentLight.WPF;
-using Syncfusion.Windows.Tools.Controls;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Mvvm.Contracts;
-using Wpf.Ui.Mvvm.Services;
 
 namespace LXIntegratedNavigation.WPF;
 

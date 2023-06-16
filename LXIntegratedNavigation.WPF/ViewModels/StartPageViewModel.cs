@@ -1,30 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Xps.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging.Messages;
 using LXIntegratedNavigation.Shared.Essentials.Navigation;
 using LXIntegratedNavigation.Shared.Models;
-using LXIntegratedNavigation.WPF.Converters;
 using LXIntegratedNavigation.WPF.Models;
 using LXIntegratedNavigation.WPF.Services;
 using Microsoft.Win32;
 using NaviSharp;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
@@ -94,7 +81,6 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
     double _stdAccBias = 400E-5;
-
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue, ErrorMessage = "必须>=0")]
@@ -127,12 +113,12 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
-    string _stdInitRText = "0.009, 0.008, -0.022";
+    string _stdInitRText = "0.1,0.1,0.1";
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
-    string _stdInitVText = "0.000,0.000,-0.000";
+    string _stdInitVText = "0,0,0";
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "不能为空")]
@@ -142,7 +128,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [NotifyDataErrorInfo]
     [Required(AllowEmptyStrings = false, ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateVector3d))]
-    string _gnssLeverArmText = "-0.0450,0.1990,-0.8510";
+    string _gnssLeverArmText = "-0.1000,0.2350,-0.8510";
 
     public static ValidationResult ValidateFilePath(string filePath)
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LXIntegratedNavigation.WPF.Models;
+﻿namespace LXIntegratedNavigation.WPF.Models;
 
 public enum LogType
 {

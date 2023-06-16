@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Media;
 using LXIntegratedNavigation.WPF.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentLight.WPF;
 using Wpf.Ui.Appearance;
