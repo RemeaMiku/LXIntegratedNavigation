@@ -55,7 +55,7 @@ public partial class StartPageViewModel : ObservableValidator, IProgress<int>
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "不能为空")]
     [CustomValidation(typeof(StartPageViewModel), nameof(ValidateLocation))]
-    string _initLocationText = "30.5278108404, 114.3557126448, 22.312";
+    string _initLocationText = "30.5278108948,114.3557126173,22.321";
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(AllowEmptyStrings = true)]
