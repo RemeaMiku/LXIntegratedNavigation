@@ -1,10 +1,3 @@
-<style>
-img{
-    width: 60%;
-    padding-left: 20%;
-}
-</style>
-
 # LXIntegratedNavigation
 ## 项目简介
 这是2023年武汉大学导航工程大三下学期综合实习的 .NET 7项目，大概花了1个半月完成，包含名为 [LXIntegratedNavigation.Shared](https://github.com/RemeaMiku/LXIntegratedNavigation/tree/master/LXIntegratedNavigation.Shared) 控制台程序和名为 [LXIntegratedNavigation.WPF](https://github.com/RemeaMiku/LXIntegratedNavigation/tree/master/LXIntegratedNavigation.WPF) 的程序。均依赖于另一个自编工具库 [NaviSharp](https://github.com/RemeaMiku/NaviSharp)。其中 WPF 程序使用了 MVVM 社区工具包、微软依赖注入扩展、WPF UI、Syncfusion WPF、gong-wpf-dragdrop 和 WpfMath 等 Nuget 包。
